@@ -1,0 +1,153 @@
+---
+title: "R para datos de biologging"
+subtitle: "Hojas de cálculo"
+author: "Rocío Joo"
+date: "Nov.-Dic.  2020"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["chocolate-fonts", "hygge"]
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+
+# Objetivos de esta unidad
+
+ * Implementar buenas prácticas de formato en hojas de cálculo
+ * Identificar malas prácticas de formato en hojas de cálculo
+ * Tener datos en hojas de cálculo listos para ser exportados a otros programas para su análisis
+ 
+--
+ 
+Primero un sondeo:
+ **¿Para qué usas hojas de cálculo?** 
+
+Ir a www.menti.com y usar el código que les daré [3 minutos]
+
+<!-- (https://www.mentimeter.com/s/c2fc80c0c43b769833a37a41f100456b/e3dab38712a8) -->
+<!-- 5081773 -->
+
+--
+ 
+**Si haces cálculos en Excel, ¿cuáles son?** 
+
+En el GD: ./R-Rocío/01-Hojas-Calculo/Actividades hay un doc
+
+  * Abrirlo
+  * Poner la respuesta bajo su nombre
+
+[3 minutos]
+
+```{r, echo = FALSE}
+library(countdown)
+
+countdown(minutes = 3, seconds = 0)
+```
+ 
+---
+ 
+**¿Le ves problemas a hacer cálculos en Excel?** En el mismo doc [3 minutos]
+
+```{r, echo = FALSE}
+# library(countdown)
+
+countdown(minutes = 3, seconds = 0)
+```
+
+--
+
+Opinión personal: 
+ 
+ * No hace todos los cálculos que yo quisiera o con todas las funcionalidades que yo quisiera
+ * No hay muchas opciones para gráficos
+ * Es más difícil ver que me equivoqué
+
+--
+
+**¿Por qué uso hojas de cálculo?**
+
+* Son prácticas para ver los datos cuando son pocos y ordenarme antes de leerlos en R
+ 
+---
+<!-- (van 15 min) -->
+
+# Reconociendo problemas en hojas de cálculo
+
+Ejercicio en grupos aleatorios:
+
+1. Bajar los datos messy.xls en el GD: ./R-Rocío/01-Hojas-Calculo/Datos
+
+2. Imaginar que son los datos con los que tienen que hacer sus análisis.
+
+3. 10 minutos para enumerar todos los problemas del archivo
+
+4. 10 minutos para describir cómo sería la nueva versión del archivo si tuvieran que hacerla ustedes
+
+5. Añadir la descripción en el google doc.
+
+```{r, echo = FALSE}
+# library(countdown)
+
+countdown(minutes = 20, seconds = 0)
+```
+
+--
+
+Veamos qué dijeron los grupos
+
+--
+
+¿Alguno pensó en crear un archivo nuevo con nombre distinto?
+
+---
+
+# Errores comunes en hojas de cálculo
+
+* Múltiples tablas en una hoja
+* Múltiples hojas cuando se podría tener todo en una
+* Dejar en blanco cuando es cero
+* Representar datos faltantes con algún valor numérico (para R, mejor NA)
+* Usar colores, negrita o cursiva para representar algo
+* Unir celdas (problemático para la exportación de datos)
+* Mezclar comentarios o unidades, o alguna información adicional con los datos en la misma celda
+* Nombres de columnas problemáticos (e.g. con espacio o acentos)
+* Usar caracteres especiales (a menos que sepas lidiar con ellos)
+* Añadir información adicional en celdas aisladas. Puede ir en un Read Me.
+
+* **Formato de fecha**
+
+--
+
+* Exportar en .xls o .xlsx: depende de la versión, no funciona bien en plataformas libres como LibreOffice u Open Office. 
+* .csv es un formato abierto, universal, estático y muchos programas lo pueden leer, incluyendo Excel. 
+
+---
+
+# Trabajando con sus datos
+
+Repartidos en grupos pre-definidos, trabajen con sus hojas de cálculo. 
+¿Hay que arreglarlas? ¿Hay que modificar el Read Me?
+
+¿Cómo deben estar sus datos para luego analizarlos?
+
+¿Cuánto tiempo necesitan para esto?
+
+---
+
+# Presentaciones de las hojas de cálculo de los grupos
+
+[20 min máx]
+
+---
+
+# Bibliografía
+
+Para preparar esta unidad se utilizó:
+
+Material y datos de: 
+  * [Data Carpentry](https://datacarpentry.org/spreadsheet-ecology-lesson/)
+
+

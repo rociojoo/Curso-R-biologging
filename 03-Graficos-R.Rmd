@@ -1,0 +1,1203 @@
+---
+title: "R para datos de biologging"
+subtitle: "Gráficos en R"
+author: "Rocío Joo"
+date: "Nov.-Dic.  2020"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["chocolate-fonts", "hygge"]
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+
+# Objetivos de esta unidad 
+
+ * Entender la gramática ggplot
+ * Hacer diferentes tipos de gráficos en R (puntos, boxplots, etc.)
+ * Graficar series de tiempo y mapas
+ * Hacer gráficos de trayectorias
+ * Hacer gráficos interactivos
+ * Hacer animaciones
+
+---
+
+# Explorando datos de trayectorias
+
+Primero llamamos a todos los paquetes y definimos los directorios de datos y gráficos
+
+```{r, message=FALSE}
+library(ggplot2) # ggplot
+library(dplyr) # pipe
+library(colorspace) # scale_fill_discrete_qualitative
+library(nycflights13) # airplane data
+library(patchwork) # mostrar gráficos juntos
+library(palmerpenguins) # penguin data
+library(ggrepel) # tomar distancia en textos
+library(sftrack) # manejar datos de trayectorias
+library("rnaturalearth") # mapas del mundo
+library("rnaturalearthdata") # mapas del mundo 
+library(stars) # read rasters
+library(plotly) # interactive graphs
+library(gganimate) # animations
+library(htmlwidgets)
+library(transformr)
+
+path_data <- "./data/"
+path_plots <- "./img/"
+```
+
+---
+
+# Explorando datos de trayectorias
+
+Utilizaremos un ejemplo de [datos de trayectorias de albatross]( https://github.com/tommyclay/alba-wind-behaviour)
+
+```{r, eval = FALSE}
+download.file(url = "https://raw.githubusercontent.com/tommyclay/alba-wind-behaviour/master/Data_inputs/GPS_SouthGeorgia_2012.csv", destfile = paste0(path_data,"GPS_SouthGeorgia_2012.csv"))
+```
+
+```{r}
+alba <- read.csv(paste0(path_data,"GPS_SouthGeorgia_2012.csv"), stringsAsFactors = TRUE)
+```
+
+```{r}
+head(alba)
+```
+
+
+---
+
+# Explorando datos de trayectorias
+
+```{r}
+str(alba)
+```
+
+* ID: ID del track
+* sex: F o M
+* x: longitude
+* y: latitude
+* ws: wind speed
+* dir: wind direction
+* lod: light or dark (day or night)
+
+---
+
+# Explorando datos de trayectorias
+
+```{r}
+alba$ID <- as.factor(alba$ID)
+nlevels(alba$ID)
+summary(alba)
+```
+
+
+---
+
+# La gramática de gráficos en ggplot
+
+Así como hay gramática del lenguaje, también hay una gramática de gráficos.
+
+* Data: data frame de donde salen los datos. Cada columna es una variable y cada fila una observación.
+
+```{r, fig.width=3.5, fig.height = 3.5}
+ggplot(data = alba)
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Mapping: 
+  * aesthetics: qué variables corresponden a qué propiedades del gráfico (e.g. eje x, y, color)
+  * facets: qué variables corresponden a diferentes paneles en el plot
+
+```{r, fig.width=4, fig.height = 4}
+ggplot(data = alba, mapping = aes(x = ws, y = dir))
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Geometries: el tipo de gráfico que queremos
+
+```{r, fig.width=4, fig.height = 4}
+ggplot(data = alba, mapping = aes(x = ws, y = dir)) +
+  geom_point()
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Geometries: el tipo de gráfico que queremos
+
+```{r, fig.width=4, fig.height = 4}
+ggplot(data = alba, mapping = aes(x = ws, y = dir, color = sex)) +
+  geom_point()
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Geometries
+
+Asumiendo que no hay problemas de proyección (lo veremos luego)
+
+```{r, fig.width=4, fig.height = 4}
+ggplot(data = alba, mapping = aes(x = x, y = y, color = sex)) +
+  geom_point()
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Geometries
+
+Si queremos cambiar la estética general dentro de una geometría:
+
+```{r, fig.width=4, fig.height = 4}
+ggplot(data = alba, mapping = aes(x = x, y = y)) +
+  geom_point(color = "blue", cex = 0.5)
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Geometries
+
+Los tipos de estética que se pueden usar están relacionados a la geometría que usamos
+
+```{r, fig.width=4, fig.height = 4}
+ggplot(data = alba, aes(x = x, y = y)) +
+  geom_line(color = "blue", linetype = 2, cex = 0.1)
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Geometries
+
+geom_line conecta observaciones en el orden de la variable en el eje x; 
+geom_path conecta observaciones en el orden en que aparecen en el df
+
+```{r, fig.width=4, fig.height = 4}
+ggplot(data = alba, aes(x = x, y = y)) +
+  geom_path(color = "blue", linetype = 2, cex = 0.1)
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Geometries
+
+```{r, fig.width=5.5, fig.height = 4}
+ggplot(data = alba, aes(x = x, y = y)) +
+  geom_path(aes(group = ID, color = ID), linetype = 1, size = 2)
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Geometries
+
+```{r, fig.width=5.5, fig.height = 4}
+ggplot(data = alba, aes(x = x, y = y)) +
+  geom_path(aes(group = ID, color = ID), linetype = 1, size=2) +
+  geom_point(cex = 0.1)
+
+```
+
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Geometries
+
+```{r, fig.width=5.5, fig.height = 4}
+ggplot(data = alba, aes(x = x, y = y)) +
+  geom_path(aes(group = ID, color = ID), linetype = 1, size=2) +
+  geom_point(data = filter(alba, lod == "L"), cex = 0.1)
+
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Geometries
+
+Veamos otras geometrías
+
+```{r, fig.width=5.5, fig.height = 4}
+ggplot(data = alba, aes(x = x, y = y)) +
+  geom_density_2d()
+
+```
+---
+
+# La gramática de gráficos en ggplot
+
+* Geometries
+
+Veamos otras geometrías
+
+```{r, fig.width=5, fig.height = 3.5}
+ggplot(data = alba, aes(x = ws)) +
+  geom_histogram()
+
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Geometries
+
+Veamos otras geometrías
+
+```{r, fig.width=5, fig.height = 3.5}
+ggplot(data = alba, aes(x = ws)) +
+  geom_histogram(binwidth = 0.5)
+
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Geometries
+
+Veamos otras geometrías
+
+```{r, fig.width=5, fig.height = 3.5, message=FALSE}
+ggplot(data = alba, aes(x = ws, fill = sex)) +
+  geom_histogram()
+
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Geometries
+
+Veamos otras geometrías
+
+```{r, fig.width=5, fig.height = 3.5, message=FALSE}
+ggplot(data = alba, aes(x = ws, color = sex)) +
+  geom_histogram()
+
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Geometries
+
+Veamos otras geometrías
+
+```{r, fig.width=4, fig.height = 4, message=FALSE}
+ggplot(data = alba, aes(y = ws)) +
+  geom_boxplot()
+
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Geometries
+
+Veamos otras geometrías
+
+```{r, fig.width=5, fig.height = 3.5, message=FALSE}
+ggplot(data = alba, aes(y = ws, x = sex, color = sex)) +
+  geom_boxplot()
+
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Geometries
+
+Veamos otras geometrías
+
+```{r, fig.width=3.5, fig.height = 3.5, message=FALSE}
+ggplot(data = alba, mapping = aes(x = sex)) +
+  geom_bar()
+
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Statistical transformations: asociadas a las geometrías
+
+Cada geometría tiene una transformación estadística por defecto: 
+* conteos para gráficos de barras (stat = "count" o "identity") e histogramas (stat = "bin"), 
+* cuantiles para boxplots (stat = "boxplot")
+
+Estos se calculan con la función ggplot tras bambalinas.
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Statistical transformations: asociadas a las geometrías
+
+Histograma con frecuencia relativa:
+
+```{r, fig.width=4.5, fig.height = 4.5, message=FALSE}
+ggplot(data = alba, mapping = aes(x = ws)) + 
+  geom_histogram(aes(y = stat(density)))
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Positions: función para ajustar la posición de los objetos en el gráfico
+
+--
+
+Si queremos comparar el número de datos por sexo
+
+```{r, fig.width=4.5, fig.height = 3.5, message=FALSE}
+ggplot(data = alba, mapping = aes(y = sex)) +
+  geom_bar()
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Positions: función para ajustar la posición de los objetos en el gráfico
+
+Si queremos comparar el número de datos por sexo y de luz/oscuridad
+
+```{r, fig.width=4.5, fig.height = 3.5, message=FALSE}
+ggplot(data = alba, mapping = aes(y = sex)) +
+  geom_bar(aes(fill = lod))
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Positions: función para ajustar la posición de los objetos en el gráfico
+
+Si queremos comparar el número de datos individuales en cada categoría
+
+```{r, fig.width=5.5, fig.height = 4.5, message=FALSE}
+ggplot(data = alba, mapping = aes(y = sex)) +
+  geom_bar(aes(fill = lod), position = "dodge")
+```
+
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Positions: función para ajustar la posición de los objetos en el gráfico
+
+Si queremos comparar el número de datos con luz/oscuridad dentro de cada categoría de sexo
+
+```{r, fig.width=5.5, fig.height = 3.5, message=FALSE}
+ggplot(data = alba, mapping = aes(y = sex)) +
+  geom_bar(aes(fill = lod), position = "fill")
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Scales: propiedades relacionadas a estética 
+
+`scale_<aesthetic>_<type>`
+
+`<type>` puede ser continuous, discrete, etc.
+
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Scales: propiedades relacionadas a estética 
+
+`scale_<aesthetic>_<type>`
+
+```{r, fig.width=5.5, fig.height = 3.5, message=FALSE}
+ggplot(data = alba, mapping = aes(y = sex)) +
+  geom_bar(aes(fill = lod), position = "fill") +
+  scale_x_continuous(breaks = seq(from = 0, to = 1, by = 0.1))
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Scales: propiedades relacionadas a estética 
+
+`scale_<aesthetic>_<type>`
+
+```{r, fig.width=5.5, fig.height = 3.5, message=FALSE}
+ggplot(data = alba, mapping = aes(y = sex)) +
+  geom_bar(aes(fill = lod), position = "fill") +
+  scale_x_continuous(breaks = seq(from = 0, to = 1, by = 0.1)) +
+  scale_y_discrete(label = c("Female", "Male")) 
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Scales: propiedades relacionadas a estética 
+
+`scale_<aesthetic>_<type>`
+
+Para escalas de color, sugiero paletas como [colorbrewer](https://colorbrewer2.org/),
+[viridis](https://www.thinkingondata.com/something-about-viridis-library/) y [colorspace](https://cran.r-project.org/web/packages/colorspace/vignettes/colorspace.html)
+que consideran color blindness.
+
+--
+
+```{r, fig.width=5, fig.height = 3, message=FALSE}
+ggplot(data = alba, mapping = aes(y = sex)) +
+  geom_bar(aes(fill = lod), position = "fill") +
+  scale_x_continuous(breaks = seq(from = 0, to = 1, by = 0.1)) +
+  scale_y_discrete(label = c("Female", "Male")) +
+  scale_fill_brewer(palette = "Set2")
+```
+
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Scales: propiedades relacionadas a estética 
+
+`scale_<aesthetic>_<type>`
+
+Para escalas de color, sugiero paletas como [colorbrewer](https://colorbrewer2.org/),
+[viridis](https://www.thinkingondata.com/something-about-viridis-library/) y [colorspace](https://cran.r-project.org/web/packages/colorspace/vignettes/colorspace.html)
+que consideran color blindness.
+
+
+```{r, fig.width=5, fig.height = 3, message=FALSE}
+ggplot(data = alba, mapping = aes(y = sex)) +
+  geom_bar(aes(fill = lod), position = "fill") +
+  scale_x_continuous(breaks = seq(from = 0, to = 1, by = 0.1)) +
+  scale_y_discrete(label = c("Female", "Male")) +
+  scale_fill_viridis_d(option = "C")
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Scales: propiedades relacionadas a estética 
+
+`scale_<aesthetic>_<type>`
+
+Para escalas de color, sugiero paletas como [colorbrewer](https://colorbrewer2.org/),
+[viridis](https://www.thinkingondata.com/something-about-viridis-library/) y [colorspace](https://cran.r-project.org/web/packages/colorspace/vignettes/colorspace.html)
+que consideran color blindness.
+
+```{r, fig.width=5, fig.height = 3, message=FALSE}
+ggplot(data = alba, mapping = aes(y = sex)) +
+  geom_bar(aes(fill = lod), position = "fill") +
+  scale_x_continuous(breaks = seq(from = 0, to = 1, by = 0.1)) +
+  scale_y_discrete(label = c("Female", "Male")) +
+  scale_fill_viridis_d(option = "C", end = 0.7)
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Scales: propiedades relacionadas a estética 
+
+`scale_<aesthetic>_<type>`
+
+Para escalas de color, sugiero paletas como [colorbrewer](https://colorbrewer2.org/),
+[viridis](https://www.thinkingondata.com/something-about-viridis-library/) y [colorspace](https://cran.r-project.org/web/packages/colorspace/vignettes/colorspace.html)
+que consideran color blindness.
+
+```{r, fig.width=5, fig.height = 3, message=FALSE}
+ggplot(data = alba, mapping = aes(y = sex)) +
+  geom_bar(aes(fill = lod), position = "fill") +
+  scale_x_continuous(breaks = seq(from = 0, to = 1, by = 0.1)) +
+  scale_y_discrete(label = c("Female", "Male")) +
+  scale_fill_discrete_qualitative(palette = "Set 3")
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Facets: divide los datos en paneles a partir de una o varias variables
+
+--
+
+Facets con una variable
+
+```{r, fig.width=5, fig.height = 3.5, message=FALSE}
+ggplot(data = alba, aes(x = ws)) +
+  geom_histogram() +
+  facet_wrap(~ sex)
+
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Facets: divide los datos en paneles a partir de una o varias variables
+
+Facets con dos variables
+
+```{r, fig.width=5, fig.height = 3.5, message=FALSE}
+ggplot(data = alba, aes(x = ws)) +
+  geom_histogram() +
+  facet_grid(sex ~ lod)
+
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Coordinates: Sistema de coordenadas. ¿Cómo interpretar x y y?
+
+Hay varios tipos de coordenadas. Veamos los que son útiles para mapas.
+
+  * coord_quickmap: ajusta la imagen de manera que 1 m de latitud y 1 m de longitud tengan la misma distancia en el centro de la figura. Podría ser suficientemente bueno para zonas pequeñas.
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Coordinates: Sistema de coordenadas. ¿Cómo interpretar x y y?
+
+Hay varios tipos de coordenadas. Veamos los que son útiles para mapas.
+
+```{r, fig.height=5}
+ggplot(data = alba, aes(x = x, y = y)) +
+  geom_point() +
+  coord_quickmap()
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Coordinates: Sistema de coordenadas. ¿Cómo interpretar x y y?
+
+Hay varios tipos de coordenadas. Veamos los que son útiles para mapas.
+
+  * coord_map: usa el paquete `mapproj` para hacer proyecciones.
+
+```{r, fig.height=4.5}
+ggplot(data = alba, aes(x = x, y = y)) +
+  geom_point() +
+  coord_map(projection = "lambert", parameters = c(-45, -65))
+
+# parameters: lines of latitude for that serve as the projection's lines of tangency
+# for the Lambert projection to preserve angles locally (conformal mapping)
+
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Coordinates: Sistema de coordenadas. ¿Cómo interpretar x y y?
+
+
+```{r, fig.height=4, warning = FALSE}
+world <- map_data("world")
+
+ggplot(data = world, aes(x = long, y = lat)) +
+  geom_path(aes(group = group), color = "grey") +
+  geom_path(data = alba, aes(x = x, y = y, group = ID, color = sex)) +
+  scale_y_continuous(name = "latitude", limits = c(min(alba$y)-1, max(alba$y)+1)) +
+  scale_x_continuous(name = "longitude", limits = c(min(alba$x)-1, max(alba$x)+1)) +
+  scale_color_brewer(palette = "Set2") +
+  coord_map(projection = "lambert", parameters = c(-45, -65))
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Themes: Cambios estéticos no relacionados a los datos
+
+```{r, warning = FALSE, message= FALSE, fig.height = 4}
+ggplot(data = alba, aes(x = ws, color = sex)) +
+  geom_histogram() +
+  ggtitle("Histograma de wind speed")
+```
+---
+
+# La gramática de gráficos en ggplot
+
+* Themes: Cambios estéticos no relacionados a los datos
+
+```{r, warning = FALSE, message= FALSE, fig.height = 4}
+ggplot(data = alba, aes(x = ws, color = sex)) +
+  geom_histogram() +
+  ggtitle("Histograma de wind speed") +
+  theme(
+    plot.title = element_text(color = "#2ca25f", size = 16, face = "bold.italic")
+  )
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Themes: Cambios estéticos no relacionados a los datos
+
+```{r, warning = FALSE, message= FALSE, fig.height = 3}
+ggplot(data = alba, aes(x = ws, color = sex)) +
+  geom_histogram() +
+  ggtitle("Histograma de wind speed") +
+  xlab("wind speed") +
+  scale_color_discrete(name = "sexo", labels = c("Female", "Male")) +
+  theme(
+    plot.title = element_text(color = "#2ca25f", size = 16, face = "bold.italic"),
+    axis.title.x = element_text(color = "#2b8cbe", size = 14, face = "bold"),
+    axis.title.y = element_text(color = "#2b8cbe", size = 14, face = "bold"),
+    legend.position = "bottom",
+    legend.direction = "horizontal"
+  )
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Themes: Cambios estéticos no relacionados a los datos
+
+```{r, warning = FALSE, message= FALSE, fig.height = 3.5}
+ggplot(data = alba, aes(x = ws, color = sex)) +
+  geom_histogram() +
+  ggtitle("Histograma de wind speed") +
+  xlab("wind speed") +
+  theme(
+    plot.title = element_text(color = "#2ca25f", size = 16, face = "bold.italic"),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank()
+  )
+```
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Themes: Cambios estéticos no relacionados a los datos
+
+```{r, warning = FALSE, message= FALSE, fig.height = 4}
+ggplot(data = alba, aes(x = ws, color = sex)) +
+  geom_histogram() +
+  theme_light() 
+```
+
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Themes: Cambios estéticos no relacionados a los datos
+
+```{r, warning = FALSE, message= FALSE, fig.height = 4}
+ggplot(data = alba, aes(x = ws, color = sex)) +
+  geom_histogram() +
+  theme_classic() 
+```
+
+---
+
+# ggplot: desafíos 
+
+Desafío 1: Con lo aprendido en esta y la unidad anterior, cargar los datos de meteorología del paquete `nycflights13` y graficar la serie de tiempo de temperatura de un aeropuerto. 
+
+Desafío 2: A partir de los datos alba, graficar la serie de tiempo de velocidad del viento de un track. No hay fechas ni tiempo, pero las observaciones dentro de cada track están ordenadas cronológicamente con una distancia temporal de 25 minutos. 
+
+[20 minutos, levantar la mano digital al terminar]
+
+```{r, echo = FALSE}
+# library(countdown)
+
+countdown(minutes = 20, seconds = 0)
+```
+
+---
+
+# ggplot: desafíos 
+
+Desafío 1
+
+```{r, warning = FALSE, message= FALSE, fig.height = 4}
+ggplot(data = weather %>% 
+         filter(origin == "LGA"), 
+       aes(x = time_hour, y = temp)) +
+geom_line()
+
+```
+
+---
+
+# ggplot: desafíos 
+
+Desafío 2
+
+```{r, warning = FALSE, message= FALSE, fig.height = 4}
+sub_data <- alba %>% 
+  filter(ID == "11")
+sub_data$time <- 1:dim(sub_data)[1]
+
+ggplot(data = sub_data, aes(x = time, y = ws)) +
+  geom_line()
+
+```
+
+---
+
+# Más allá de ggplot
+
+Volvamos a los datos de pingüinos, esta vez usando el paquete `palmerpenguins`
+
+```{r}
+data(penguins)
+head(penguins)
+```
+
+---
+
+# Varios gráficos en una figura
+
+Con el paquete `patchwork`, podemos hacer gráficos distintos y mostrarlos juntos
+
+```{r, warning = FALSE, message= FALSE, fig.height = 3.5}
+plot_1 <- ggplot(data = penguins, aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point()
+plot_2 <- ggplot(data = penguins %>%  filter(!is.na(sex)), 
+                 aes(x = bill_length_mm, fill = sex)) + 
+  geom_histogram()
+plot_3 <- ggplot(data = penguins %>%  filter(!is.na(sex)), 
+                 aes(x = bill_depth_mm, fill = sex)) + 
+  geom_histogram()
+plot_1 / (plot_2 | plot_3)
+```
+
+---
+
+# Texto en los gráficos
+
+```{r, warning = FALSE, message= FALSE, fig.height = 3.5}
+
+sum_penguins <- penguins %>%
+  group_by(species, island) %>% 
+  summarise(mass = mean(body_mass_g, na.rm = TRUE), flipper = mean(flipper_length_mm, na.rm = TRUE))
+
+sum_penguins <- sum_penguins %>% 
+  mutate(spe_isl = paste(species, island, sep = "-"))
+
+sum_penguins
+
+```
+
+---
+
+# Texto en los gráficos
+
+```{r, warning = FALSE, message= FALSE, fig.height = 3.5}
+
+ggplot(data = sum_penguins, aes(x = mass, y = flipper)) +
+  geom_point()
+
+```
+
+---
+
+# Texto en los gráficos
+
+```{r, warning = FALSE, message= FALSE, fig.height = 3.5}
+
+ggplot(data = sum_penguins, aes(x = mass, y = flipper, label = spe_isl)) +
+  geom_point() +
+  geom_text()
+```
+
+---
+
+# Texto en los gráficos
+
+Con el paquete `ggrepel`, el texto toma la distancia necesaria
+
+```{r, warning = FALSE, message= FALSE, fig.height = 3.5}
+
+ggplot(data = sum_penguins, aes(x = mass, y = flipper, label = spe_isl)) +
+  geom_point() +
+  geom_text_repel()
+```
+
+---
+
+# Guardando gráficos
+
+```{r, warning = FALSE, message= FALSE, fig.height = 3.5}
+p1 <- ggplot(data = sum_penguins, aes(x = mass, y = flipper, label = spe_isl)) +
+  geom_point() +
+  geom_text_repel()
+```
+
+```{r, message=FALSE, eval = FALSE}
+ggsave(plot = p1, filename = paste0(path_plots, "penguin_mass_flipper.png"))
+ggsave(plot = p1, filename = paste0(path_plots, "penguin_mass_flipper.pdf"))
+ggsave(plot = p1, filename = paste0(path_plots, "penguin_mass_flipper.svg"))
+```
+
+Pueden explorar los argumentos para el tamaño y resolución del objeto guardado.
+
+---
+
+# ¡Desafío con sus datos!
+
+1. Piensen en los gráficos que necesiten hacer para explorar sus datos en la dirección de sus preguntas de investigación
+
+2. Háganlos
+
+3. Una vez listos, los pegarán en un documento google slides. Pueden pegar máximo 5 gráficos. 
+
+4. Los comentaremos, daremos sugerencias para mejorar y votaremos por el gráfico ganador. 
+
+Los juntaremos en sus respectivos grupos.
+
+Tendrán 30 minutos. 
+
+
+---
+
+# sftrack y sf
+
+`sftrack` es un nuevo paquete creado para el manejo de datos de trayectorias. 
+
+* El tiempo necesita estar en clase `POSIXct`
+* El espacio debe estar definido utilizando las clases de datos `sf`
+* Debe haber una variable de agrupamiento de datos, e.g. ID del individuo
+
+Para los datos alba, creamos un index de tiempo, definimos una proyección y transformamos el data frame a objeto sftrack
+
+```{r}
+alba$tiempo <- ave(alba$x, alba$ID, FUN = seq_along)
+proyeccion <- "+init=epsg:4326"
+  # "+proj=aeqd +lat_0=-54.01 +lon_0=-38.05 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0" # si no hay más información de lon y lat 
+  
+alba_sftrack <- as_sftrack(
+  data = alba,
+  coords = c("x", "y"),
+  time = "tiempo",
+  group = "ID",
+  crs = proyeccion
+)
+
+```
+
+---
+
+# sftrack y sf
+
+Un objeto `sftrack` está definido como un conjunto de tracks o series de localizaciones. 
+
+```{r}
+head(alba_sftrack)
+```
+
+---
+
+# sftrack y sf
+
+Un objeto `sftrack` está definido como un conjunto de tracks o series de localizaciones. 
+
+```{r, warning = FALSE, message= FALSE, fig.height = 5}
+plot(alba_sftrack, axes = TRUE)
+```
+
+---
+
+# sftrack y sf
+
+Un objeto `sftraj` está definido como un conjunto de trayectorias o series de desplazamientos (un desplazamiento conecta 2 localizaciones sucesivas)
+
+```{r, warning = FALSE, message= FALSE}
+alba_sftraj <- as_sftraj(alba_sftrack)
+head(alba_sftraj)
+```
+
+---
+
+# sftrack y sf
+
+Un objeto `sftraj` está definido como un conjunto de trayectorias o series de desplazamientos (un desplazamiento conecta 2 localizaciones sucesivas)
+
+```{r, warning = FALSE, message= FALSE, fig.height = 5}
+plot(alba_sftraj, axes = TRUE)
+```
+
+---
+
+# sftrack y sf
+
+Se puede usar ggplot con estos objetos, y con `geom_sf` se reconoce la estructura espacial de los datos
+
+```{r, warning = FALSE, message= FALSE, fig.height=4}
+ggplot(data = alba_sftrack, aes(x = x, y = y, color = ID)) +
+  geom_sf() +
+  theme(legend.position = "none")
+```
+
+---
+
+# sftrack y sf
+
+Utilicemos mapas de países del paquete `rnaturalearth`
+
+```{r, warning = FALSE, message= FALSE, fig.height=3}
+world <- ne_countries(scale = "medium", returnclass = "sf") # en clase sf
+
+mapa_mundo <- ggplot(data = world) + 
+   geom_sf() 
+
+mapa_mundo +
+  geom_sf(data = alba_sftraj, aes(color = ID))  +
+  scale_y_continuous(name = "", limits = c(min(alba_sftrack$y)-1, max(alba_sftrack$y)+1)) +
+  scale_x_continuous(name = "", limits = c(min(alba_sftrack$x)-1, max(alba_sftrack$x)+1)) +
+  theme_light() +
+  theme(legend.position = "none") 
+  
+```
+
+---
+
+# raster and shape files
+
+Utilizaremos datos de la NOAA  para ilustrar con ejemplos
+
+```{r, warning = FALSE, message= FALSE, fig.height=3}
+raster_file <- paste0(path_plots, "sst_io.bin.20201025.tif" )
+# explicaré cómo bajar el archivo en clase o lo pasaré
+
+sat_vis <- read_stars(raster_file) # read_stars from the stars package
+
+ggplot() +
+  geom_stars(data = sat_vis) +
+  geom_sf(data = world)  +
+  geom_sf(data = alba_sftraj, aes(color = ID))  +
+  scale_y_continuous(name = "", limits = c(min(alba_sftrack$y)-1, max(alba_sftrack$y)+1)) +
+  scale_x_continuous(name = "", limits = c(min(alba_sftrack$x)-1, max(alba_sftrack$x)+1)) +
+  theme_light() +
+  theme(legend.position = "none") 
+
+```
+
+---
+
+# raster and shape files
+
+```{r, warning = FALSE, message= FALSE, fig.height=3}
+shape_file <- paste0(path_plots, "sst_io.20201025.shp" )
+# explicaré cómo bajar el archivo en clase o lo pasaré
+# 
+sat_sh <- st_read(shape_file) # st_read from the sf package
+```
+
+---
+
+# raster and shape files
+
+```{r, warning = FALSE, message= FALSE, fig.height=3}
+ggplot() +
+  geom_sf(data = sat_sh, color = "#56B4E9") +
+  geom_sf(data = world)  +
+  geom_sf(data = alba_sftraj, aes(color = ID))  +
+  scale_y_continuous(name = "", limits = c(min(alba_sftrack$y)-1, max(alba_sftrack$y)+1)) +
+  scale_x_continuous(name = "", limits = c(min(alba_sftrack$x)-1, max(alba_sftrack$x)+1)) +
+  scale_color_viridis_d() +
+  theme(legend.position = "none") 
+
+```
+
+---
+
+# Gráficos interactivos
+
+Hacemos un gráfico sin mapa detrás (más simple y rápido)
+
+```{r, warning = FALSE, message= FALSE, fig.height=3}
+mapa_alba <- ggplot(data = alba_sftraj, aes(color = ID)) +
+  geom_sf()  +
+  theme_light() +
+  theme(legend.position = "none") 
+
+```
+
+---
+
+# Gráficos interactivos
+
+Añadimos la interacción con `plotly`
+
+```{r, eval = FALSE}
+ggplotly(mapa_alba, 
+         dynamicTicks = TRUE, session="knitr")
+```
+
+Y si queremos guardar el gráfico:
+
+```{r, warning = FALSE, message= FALSE, fig.height=5, eval = FALSE}
+mapa_plotly <- ggplotly(mapa_alba, 
+         dynamicTicks = TRUE, session="knitr")
+
+file_store <- paste0(path_plots, "plotly_alba.html")
+htmlwidgets::saveWidget(as_widget(mapa_plotly), 
+                        file = file.path(normalizePath(dirname(file_store)), 
+                                         basename(file_store)))
+
+```
+
+---
+
+# Gráficos interactivos
+
+* Están bien para hacer zoom
+* Es mejor no poner muchas capas
+* Hay que explorar los argumentos a cambiar
+* Pueden ver otras opciones como `leaflet`
+
+---
+
+# Animaciones
+
+Este será un ejemplo rápido para darles una idea de cómo empezar. 
+
+Como no tenemos el tiempo real en estos datos, asumiremos que a todas las aves les han puesto tags al mismo tiempo.
+
+Y para hacer las animaciones más rápidas, sólo trabajaremos con 2 tracks.
+
+```{r}
+alba_sub <- alba %>% 
+  filter(ID == "11" | ID == "12")
+
+alba_sftrack_sub <- as_sftrack(
+  data = alba_sub,
+  coords = c("x", "y"),
+  time = "tiempo",
+  group = "ID",
+  crs = proyeccion
+)
+```
+
+---
+
+# Animaciones
+
+```{r, eval = FALSE}
+plot_anim <- ggplot(data = alba_sftrack_sub, aes(color = ID)) +
+  geom_sf(cex = 2)  +
+  theme_light() +
+  theme(legend.position = "none") +
+  transition_states(tiempo)  + # en base a qué variable se hará la animación
+  shadow_mark(color = "grey") # hacer una sombra en gris de las obs pasadas
+
+# Guardar como gif
+anim_save(filename = paste0(path_plots, "anim_mp4.gif"), plot_anim) 
+
+# Guardar como mp4
+anim_mp4 <- animate(plot_anim, renderer = ffmpeg_renderer()) # creo que hay que instalar cosas en cada OS para que funcione
+anim_save(filename = paste0(path_plots, "anim_mp4.mp4"), anim_mp4) 
+
+```
+---
+
+# Su turno
+
+Piensen en sus datos.
+
+¿Pueden mejorar los gráficos que hicieron?
+
+Algunas de las últimas cosas que vimos, interacciones o animaciones, ¿ayudarían a entender los datos?
+
+Tiempo para explorar y graficar. [1 hora]
+
+
+---
+
+
+# Bibliografía
+
+Para preparar esta unidad se utilizó:
+
+Material de: 
+  * [R Ladies STL Meet up - Meenakshi Kushwaha](https://www.youtube.com/watch?v=08kQaxLNjZQ)
+  * [ggplot2: Elegant Graphics for Data Analysis ](https://ggplot2-book.org/)
+  * [Drawing beautiful maps programmatically with R, sf and ggplot2 — Part 1: Basics. Mel Moreno and Mathieu Basille.](https://www.r-spatial.org/r/2018/10/25/ggplot2-sf.html)
+  * [Open and plot shapefiles in R](https://datacarpentry.org/r-raster-vector-geospatial/06-vector-open-shapefile-in-r/)
+  * [Movement visualization workshop.](https://rociojoo.github.io/MovementVisualization.html)
+
+
+Datos de: 
+  * [Clay et al. (2020). Sex-specific effects of wind on the flight decisions of a sexually-dimorphic soaring bird: data and R code. ](https://zenodo.org/record/3824065#.XrvM-mhKg2x)
+  * [Hadley Wickham (2019). nycflights13: Flights that Departed NYC in 2013. R package version 1.0.1.](https://CRAN.R-project.org/package=nycflights13)
+  * [Horst AM, Hill AP, Gorman KB (2020). palmerpenguins: Palmer Archipelago (Antarctica) penguin data. R
+  package version 0.1.0. doi: 10.5281/zenodo.3960218.](https://allisonhorst.github.io/palmerpenguins/)
+  * [NOAA/ National Weather Service. Climate Prediction Center](https://www.cpc.ncep.noaa.gov/products/GIS/GIS_DATA/sst_oiv2/index.php)
+
+---
+
+# Bibliografía
+
+Más:
+  * ggplot: 
+    * [stda](http://www.sthda.com/english/wiki/ggplot2-title-main-axis-and-legend-titles)
+    * [Cookbook for R](http://www.cookbook-r.com/Graphs/)
+  * proyecciones:
+    * [geoawesomeness](https://www.geoawesomeness.com/best-map-projection/)
+    * [ggplot cheatsheet](https://rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
+    * [ggrepel](https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html)
+    * [An exploration of simple features for R](https://www.jessesadler.com/post/simple-feature-objects/)
+    * [Lambert](http://gisweb.massey.ac.nz/topic/webreferencesites/Digital%20Maps/dean/src/warnercnr.colostate.edu/lambert.html)
+    * [Conformal mapping](https://www.youtube.com/watch?v=48aerHs9wL0)
+    
+---
+
+# Bibliografía
+
+Aun más:
+  * Gráficos interactivos
+    * [Getting started with Plotly](https://plotly.com/ggplot2/getting-started/)
+    * [Saving widget](https://stackoverflow.com/questions/41399795/savewidget-from-htmlwidget-in-r-cannot-save-html-file-in-another-folder)
+    * [leaflet cheatsheet](https://ugoproto.github.io/ugo_r_doc/pdf/leaflet-cheat-sheet.pdf)
+  * Mapas con R:
+    * [Meetup de R-en-el-NEA](https://github.com/RenelNEA/Mapas-con-R/blob/master/presentacion%20RNEA.Rmd)
+  * Animaciones:
+    * [transformr](https://github.com/thomasp85/transformr)
+    * [gganimate cheatsheet](https://ugoproto.github.io/ugo_r_doc/pdf/gganimate.pdf)
