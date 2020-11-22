@@ -1,6 +1,6 @@
 ---
-title: "Aplicación de R para datos de biologging"
-subtitle: "GLMM en R"
+title: "R para datos de biologging"
+subtitle: "Modelos mixtos en R"
 author: "Rocío Joo"
 date: "Nov.-Dic.  2020"
 output:
@@ -16,19 +16,15 @@ output:
 
 # Objetivos de esta unidad 
 
- * Implementar modelos lineales generalizados mixtos en R e interpretar resultados
+ * Implementar modelos mixtos en R e interpretar resultados
  
 ---
 
-# Recordando teoría sobre modelos lineales generalizados mixtos
+# Recordando teoría sobre modelos lineales, generalizados y mixtos
 
 Empezaremos con un trabajo en grupo aleatorio sobre teoría de los modelos. 
 
-[~40 minutos] para discutir y llenar el cuestionario cuyo link les enviaré.
-
---
-
-Break [10 minutos]
+[30 minutos] para discutir y llenar el cuestionario cuyo link les enviaré.
 
 --
 
@@ -73,7 +69,7 @@ diferentes niveles de montañas (*mountainRange*),
 También se tomaron medidas corporales (*bodyLength*)
 
 ```{r}
-head(dragons)
+head(dragons,5)
 
 str(dragons)
 ```
@@ -273,7 +269,7 @@ Añadamos un punto (x, y) y reajustemos una regresión lineal
 
 ```{r, fig.height = 2.5, fig.width = 3.5, warning = FALSE, message=FALSE}
 point_1 = c(5.4, 11) # nuevo punto
-ex_data_1 = rbind(ex_data, point_1) # añadiéndolo
+ex_data_1 = rbind(point_1, ex_data) # añadiéndolo
 model_1 = lm(y ~ x, data = ex_data_1) # nuevo modelo
 
 ggplot(data = ex_data_1, aes(x = x, y = y)) +
@@ -295,7 +291,7 @@ Otro punto (x, y):
 
 ```{r, fig.height = 2.5, fig.width = 3.5, warning = FALSE, message=FALSE}
 point_2 = c(18, -5.7) # nuevo punto
-ex_data_2 = rbind(ex_data, point_2) # añadiéndolo
+ex_data_2 = rbind(point_2, ex_data) # añadiéndolo
 model_2 = lm(y ~ x, data = ex_data_2) # nuevo modelo
 
 ggplot(data = ex_data_2, aes(x = x, y = y)) +
@@ -316,7 +312,7 @@ Otro punto (x, y):
 
 ```{r, fig.height = 2.5, fig.width = 3.5, warning = FALSE, message=FALSE}
 point_3 = c(14, 5.1) # nuevo punto
-ex_data_3 = rbind(ex_data, point_3) # añadiéndolo
+ex_data_3 = rbind(point_3, ex_data) # añadiéndolo
 model_3 = lm(y ~ x, data = ex_data_3) # nuevo modelo
 
 ggplot(data = ex_data_3, aes(x = x, y = y)) +
@@ -356,13 +352,13 @@ Se puede, pero no hay que confiar a ciegas en un p-valor arbitrario. Ver referen
 * En grupos aleatorios, tratar de identificar si hay algún punto que esté influyendo mucho
 sobre la regresión ajustada a los datos de dragones.
 
-* Dentro del GD: CURSO R-biologging/R-Rocío/04-Modelos-Mixtos/Grupos/Dragones/, 
+* Dentro del GD: CURSO R-biologging/R-Rocío/04-Modelos-Mixtos/Actividades/Dragones/, 
   * Crear una carpeta ahí con sus iniciales, e.g. "CI-CZ"
   * Un google doc con sus nombres
   * Un script R
   * Archivo(s) de gráfico
 
-[30 minutos]
+[25 minutos]
 
 ---
 
@@ -388,7 +384,8 @@ controlando la variación debida a nivel de montaña.
 --
 
 ```{r}
-mod_mix <- lmer(formula = testScore ~ bodyLength + (1|mountainRange), data = dragons)
+mod_mix <- lmer(formula = testScore ~ bodyLength + (1|mountainRange), 
+                data = dragons)
 ```
 
 ---
@@ -701,13 +698,14 @@ En los grupos definidos, júntense para trabajar con sus datos:
 
 * Según la pregunta de investigación, definan el/los modelo(s) más adecuado(s)
 * Hacer el análisis en R
-* * Dentro del GD: CURSO R-biologging/R-Rocío/04-Modelos-Mixtos/Grupos/DatosPropios/, 
+* * Dentro del GD: CURSO R-biologging/R-Rocío/04-Modelos-Mixtos/Actividades/DatosPropios/, 
   * Crear una carpeta ahí con sus iniciales, e.g. "CI-CZ"
   * Un google doc con sus nombres
   * Un script R
-  * Archivo(s) de gráfico
+  * Archivo(s) de gráfico (o reporte Rmarkdown con R + salidas)
+  * Si prefieren hacer el trabajo individualmente, dentro de la carpeta del grupo, creen subcarpetas por persona
 
-[40 minutos]
+[¿40 minutos?]
 
 ---
 
@@ -739,7 +737,7 @@ Más:
 
 * Escoger modelos: Warton, D. I., Lyons, M., Stoklosa, J., & Ives, A. R. (2016). [Three points to consider when choosing a LM or GLM test for count data.](https://doi.org/10.1111/2041-210X.12552) Methods in Ecology and Evolution, 7(8), 882–890. 
 
-* GAMs: [Introduction to Generalized Additive Models with R and mgcv](https://www.youtube.com/watch?v=sgw4cu8hrZM&t=9135s. Gavin Simpson. Jul. 30, 2020.
+* GAMs: [Introduction to Generalized Additive Models with R and mgcv](https://www.youtube.com/watch?v=sgw4cu8hrZM&t=9135s). Gavin Simpson. Jul. 30, 2020.
 
 ---
 
