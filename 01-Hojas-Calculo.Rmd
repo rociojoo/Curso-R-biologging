@@ -137,12 +137,6 @@ Repartidos en grupos pre-definidos, trabajen con sus hojas de cálculo.
 
 ---
 
-# Presentaciones de las hojas de cálculo de los grupos
-
-[20 min máx]
-
----
-
 # Bibliografía
 
 Para preparar esta unidad se utilizó:

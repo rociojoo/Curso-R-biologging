@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>R para datos de biologging</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Rocío Joo" />
+    <link href="libs/remark-css-0.0.1/chocolate-fonts.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/hygge.css" rel="stylesheet" />
+    <link href="libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+    <script src="libs/anchor-sections-1.0/anchor-sections.js"></script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <link href="libs/font-awesome-5.3.1/css/fontawesome-all.min.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# R para datos de biologging
+## Introducción a R
+### Rocío Joo
+### Nov.-Dic. 2020
+
+---
+
+
+
+# Objetivos de esta unidad (1/2)
+
+ * Entender qué es R
+ * Navegar RStudio
+ * Incorporar buenas prácticas de trabajo con proyectos y sub-directorios
+
+
+--
+
+ * Crear objetos, asignar valores, utilizar funciones y sus argumentos
+ * Hacer operaciones simples
+ * Trabajar con objetos de clases distintas (vectores, matrices, de naturaleza lógica, numérica, de caracteres, etc.)
+ * Trabajar con datos faltantes
+ * Entender sobre paquetes, ayuda y más recursos
+ * Comentar y guardar scripts
+ 
+---
+
+# Objetivos de esta unidad (2/2)
+
+
+ * Importar un archivo .csv en forma de data frame
+ * Manejar data frames
+ * Trabajar con objetos de clases distintas
+ * Convertir vectores entre factores, caracteres y numéricos
+ * Manejar fechas
+
+--
+
+* Seleccionar algunas observaciones o columnas del data frame
+* Crear nuevas variables a partir de otras
+* Ejecutar pautas de control de calidad de los datos
+* Pasar entre formato largo y ancho
+* Unión de data frames
+* Exportar los datos
+ 
+---
+
+# ¿Qué es R? ¿Qué es RStudio?
+
+[Escriban sus respuestas en el chat]
+
+
+--
+
+R es un lenguaje de programación. También es un software que interpreta los scripts en el lenguaje R. El software R es libre (gratis) y abierto (podemos ver y compartir códigos).
+
+--
+
+RStudio es una corporación que produce, entre otras cosas, una plataforma para manejar R, conveniente para la gente vidente. 
+
+---
+
+# Navegando RStudio
+
+Advertencia: mi OS es Ubuntu 18.04 en inglés. RStudio Version 1.1.456 
+
+Veamos sus componentes.
+
+--
+
+En la consola: `R.version` ¿Cuál es su versión? [al chat]
+
+
+--
+
+&lt;img src="./img/appearance.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# Trabajar por proyecto
+
+Un directorio de trabajo y proyecto para cada trabajo.
+Mostraré cómo crear un proyecto y algunos ejemplos personales. 
+
+--
+
+Jenny Bryan escribió un [post al respecto](https://www.tidyverse.org/blog/2017/12/workflow-vs-script/).
+
+--
+
+&lt;img src="./img/RData-never.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Trabajar por proyecto
+
+Ahora creen su propio proyecto para el curso con los subdirectorios que crean convenientes.
+
+<div class="countdown" id="timer_5fb985c1" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+--
+
+¿Cuál es su espacio de trabajo? 
+
+Donde está su proyecto: `getwd()`
+
+--
+
+Cierren R y abran el proyecto. Luego `getwd()` en la consola. 
+
+---
+
+# Objetivos de esta unidad
+
+<i class="fas  fa-check "></i> Entender qué es R
+
+<i class="fas  fa-check "></i> Navegar RStudio
+
+<i class="fas  fa-check "></i> Incorporar buenas prácticas de trabajo con proyectos y sub-directorios
+
+¿Preguntas?
+
+--
+
+ * Crear objetos, asignar valores, utilizar funciones y sus argumentos
+ * Hacer operaciones simples
+ * Trabajar con objetos de clases distintas (vectores, matrices, de naturaleza lógica, numérica, de caracteres, factores, etc.)
+ * Trabajar con datos faltantes
+ * Entender sobre paquetes, ayuda y más recursos
+ * Comentar y guardar scripts
+ 
+---
+
+# ¡Empecemos con nuestras primeras operaciones!
+
+En la consola:
+
+
+```r
+15 + 6
+```
+
+```
+## [1] 21
+```
+
+```r
+1700 / 8
+```
+
+```
+## [1] 212.5
+```
+
+
+Confesión personal: Yo uso R como calculadora
+
+---
+
+
+# ¡Empecemos con nuestras primeras operaciones!
+
+
+Creemos objetos para almacenar valores con `&lt;-`
+
+
+```r
+res_suma &lt;- 15 + 6
+res_suma
+```
+
+```
+## [1] 21
+```
+
+```r
+a &lt;- 4
+
+res_suma / a
+```
+
+```
+## [1] 5.25
+```
+
+--
+
+Ahora desde un script. Para correr pueden usar CTRL + ENTER.
+
+
+¿Qué otros shortcuts en R conocen? Compártanlos en el chat
+
+---
+
+# Algunas funciones simples en R
+
+
+```r
+a &lt;- 40
+
+log(a)
+```
+
+```
+## [1] 3.688879
+```
+
+```r
+exp(a)
+```
+
+```
+## [1] 2.353853e+17
+```
+
+```r
+pi
+```
+
+```
+## [1] 3.141593
+```
+
+```r
+sqrt(a)
+```
+
+```
+## [1] 6.324555
+```
+
+```r
+round(pi, digits = 3)
+```
+
+```
+## [1] 3.142
+```
+
+---
+
+# Argumentos de funciones
+
+Los parámetros de entrada de las funciones se llaman argumentos. 
+
+Usando `args` se pueden encontrar los argumentos de una función en particular
+
+
+```r
+args(round)
+```
+
+```
+## function (x, digits = 0) 
+## NULL
+```
+
+--
+
+Especificando el nombre de cada argumento, se pueden escribir en cualquier orden
+
+
+```r
+round(digits = 3, x = pi)
+```
+
+```
+## [1] 3.142
+```
+
+---
+
+# Vectores
+
+Creemos un vector usando `c()` para concatenar valores
+
+
+```r
+temp_Florida &lt;- c(26, 32, 29)
+```
+
+--
+
+Ahora vectores de caracteres
+
+
+```r
+houses &lt;- c("Baratheon", "Lannister", "Martell", "Stark", "Targaryen")
+```
+
+--
+
+Los elementos de un vector de caracteres pueden tener un número distinto de caracteres (y palabras)
+
+
+```r
+nombres &lt;- c("Cersei Lannister", "Jon Snow", "Arya Stark", "Daenerys Stormborn of House Targaryen, the First of Her Name, Queen of the Andals and the First Men, Protector of the Seven Kingdoms, the Mother of Dragons, the Khaleesi of the Great Grass Sea, the Unburnt, the Breaker of Chains")
+```
+
+
+```r
+length(nombres)
+```
+
+```
+## [1] 4
+```
+
+
+```r
+nchar(nombres[4])
+```
+
+```
+## [1] 228
+```
+
+---
+
+# Vectores
+
+
+```r
+class(temp_Florida)
+```
+
+```
+## [1] "numeric"
+```
+
+```r
+class(houses)
+```
+
+```
+## [1] "character"
+```
+
+```r
+class(nombres)
+```
+
+```
+## [1] "character"
+```
+
+
+
+```r
+str(temp_Florida)
+```
+
+```
+##  num [1:3] 26 32 29
+```
+
+```r
+str(houses)
+```
+
+```
+##  chr [1:5] "Baratheon" "Lannister" "Martell" "Stark" "Targaryen"
+```
+
+---
+
+# Vectores
+
+
+
+```r
+temp_Florida + 1
+```
+
+```
+## [1] 27 33 30
+```
+
+¿`houses + 1`?
+
+--
+
+Podemos añadir elementos a los vectores
+
+
+```r
+(nombres &lt;- c(nombres, "Shae"))
+```
+
+```
+## [1] "Cersei Lannister"                                                                                                                                                                                                                    
+## [2] "Jon Snow"                                                                                                                                                                                                                            
+## [3] "Arya Stark"                                                                                                                                                                                                                          
+## [4] "Daenerys Stormborn of House Targaryen, the First of Her Name, Queen of the Andals and the First Men, Protector of the Seven Kingdoms, the Mother of Dragons, the Khaleesi of the Great Grass Sea, the Unburnt, the Breaker of Chains"
+## [5] "Shae"
+```
+
+O remover elementos de los vectores
+
+
+```r
+(nombres &lt;- nombres[-4])
+```
+
+```
+## [1] "Cersei Lannister" "Jon Snow"         "Arya Stark"       "Shae"
+```
+
+---
+
+# Vectores
+
+También se puede seleccionar o remover elementos cumpliendo ciertas condiciones
+
+
+```r
+temp_Florida
+```
+
+```
+## [1] 26 32 29
+```
+
+```r
+temp_Florida &gt; 30
+```
+
+```
+## [1] FALSE  TRUE FALSE
+```
+
+```r
+(temp_30 &lt;- temp_Florida[temp_Florida &gt; 30])
+```
+
+```
+## [1] 32
+```
+
+```r
+which(temp_Florida &gt; 30)
+```
+
+```
+## [1] 2
+```
+
+```r
+temp_Florida[which(temp_Florida &gt; 30)]
+```
+
+```
+## [1] 32
+```
+
+---
+
+# Vectores
+
+También se puede seleccionar o remover elementos cumpliendo ciertas condiciones
+
+
+```r
+houses
+```
+
+```
+## [1] "Baratheon" "Lannister" "Martell"   "Stark"     "Targaryen"
+```
+
+```r
+which(houses == "Stark" | houses == "Baratheon")
+```
+
+```
+## [1] 1 4
+```
+
+
+---
+
+
+Trabajo en grupos aleatorios: [15 min]
+
+(Sugerencia: que una persona comparta su pantalla)
+
+**1.** Creen estos vectores
+
+
+```r
+num_char &lt;- c(1, 2, 3, "a")
+num_logical &lt;- c(1, 2, 3, TRUE)
+char_logical &lt;- c("a", "b", "c", TRUE)
+tricky &lt;- c(1, 2, 3, "4")
+```
+
+**2.** ¿De qué clase es cada vector? ¿Por qué?
+
+**3.** ¿R considera alguna jerarquía para las clases? Si es así, ¿cuál sería?
+
+En el GD: ./R-Rocío/02-Intro-R/Actividades hay un doc
+
+  * Abrirlo
+  * Poner los nombres de integrantes de su grupo y las respuestas bajo los nombres
+ 
+<div class="countdown" id="timer_5fb9845e" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">15</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+--
+
+
+```r
+num_char &lt;- c(1, 2, 3, "a") # caracter le gana a numérico
+num_logical &lt;- c(1, 2, 3, TRUE) # numérico le gana a lógico
+char_logical &lt;- c("a", "b", "c", TRUE) # caracter le gana a lógico
+tricky &lt;- c(1, 2, 3, "4") # caracter le gana a numérico
+
+# caracter &gt; numérico &gt; lógico 
+```
+
+---
+
+# Pedir ayuda en R
+
+* Si es sobre cómo usar una función: 
+    * Si conocemos la función, usar `?` o `help()`
+    * Si es de algún paquete, buscar la documentación o vignette del paquete 
+      (¿qué es un paquete? Función `vignette`)
+    * Abrir un issue
+
+--
+
+* En caso de error:
+    * Revisa primero que no es un error de tipeo
+    * Google is your friend. Or duckduckgo.
+    * Stack Overflow. Con todos los detalles del problema, datos e incluyendo la versión de R y paquetes con los que trabajan. 
+
+--
+
+* No todos los mensajes en rojo son errores.
+
+---
+
+# Datos faltantes
+
+R interpreta `NA` como un valor faltante. 
+
+Hay operaciones que se pueden hacer 
+
+
+```r
+mean(temp_Florida)
+```
+
+```
+## [1] 29
+```
+
+```r
+temp_Florida_na &lt;- c(temp_Florida, NA)
+?mean
+mean(temp_Florida_na, na.rm = TRUE)
+```
+
+```
+## [1] 29
+```
+
+---
+
+# Datos faltantes
+
+R interpreta `NA` como un valor faltante. 
+
+Hay operaciones que se pueden hacer 
+
+
+```r
+# Identificando elementos que no son NA
+!is.na(temp_Florida_na)
+```
+
+```
+## [1]  TRUE  TRUE  TRUE FALSE
+```
+
+```r
+# Extrayendo elementos que no son NA
+temp_Florida_na[!is.na(temp_Florida_na)]
+```
+
+```
+## [1] 26 32 29
+```
+
+```r
+na.omit(temp_Florida_na)
+```
+
+```
+## [1] 26 32 29
+## attr(,"na.action")
+## [1] 4
+## attr(,"class")
+## [1] "omit"
+```
+
+---
+
+# Datos faltantes
+
+Trabajo personal:
+
+Hallar el valor de la correlación de Spearman entre
+
+
+```r
+temp_Florida_na
+```
+
+```
+## [1] 26 32 29 NA
+```
+
+y 
+
+
+```r
+hum_Florida_na &lt;- c(80,NA,78,99)
+```
+
+5 minutos y levantan la mano virtual cuando lo hayan hecho
+
+<div class="countdown" id="timer_5fb98621" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+
+--
+
+
+```r
+cor(x = temp_Florida_na, y = hum_Florida_na, # variables
+    method = "spearman", # tipo de correlación
+    use = "pairwise.complete.obs") # lidiar con NAs
+```
+
+```
+## [1] -1
+```
+
+No olviden ir guardando cambios en su script!
+
+---
+
+# Objetivos de esta unidad
+
+<i class="fas  fa-check "></i> Entender qué es R
+
+<i class="fas  fa-check "></i> Navegar RStudio
+
+<i class="fas  fa-check "></i> Incorporar buenas prácticas de trabajo con proyectos y sub-directorios
+
+<i class="fas  fa-check "></i> Crear objetos, asignar valores, utilizar funciones y sus argumentos
+
+<i class="fas  fa-check "></i> Hacer operaciones simples
+
+<i class="fas  fa-check "></i> Trabajar con objetos de clases distintas (vectores, matrices, de naturaleza lógica, numérica, de caracteres, factores, etc.)
+
+<i class="fas  fa-check "></i> Trabajar con datos faltantes
+
+<i class="fas  fa-check "></i> Entender sobre paquetes, ayuda y más recursos
+
+<i class="fas  fa-check "></i> Comentar y guardar scripts
+
+¿Preguntas?
+
+---
+
+# Objetivos de esta unidad 
+
+
+ * Importar un archivo .csv en forma de data frame
+ * Manejar data frames
+ * Trabajar con objetos de clases distintas
+ * Convertir vectores entre factores, caracteres y numéricos
+ * Manejar fechas
+ * Seleccionar algunas observaciones o columnas del data frame
+ * Crear nuevas variables a partir de otras
+ * Ejecutar pautas de control de calidad de los datos
+ * Pasar entre formato largo y ancho
+ * Unión de data frames
+ * Exportar los datos
+ 
+
+---
+
+# Importando datos de un archivo .csv
+
+Utilizaremos [datos de pingüinos de Allison Horst](https://github.com/allisonhorst/palmerpenguins).
+
+Están en el GD: ./R-Rocío/02-Intro-R/Datos/
+
+--
+
+
+```r
+# Leyendo el archivo
+path_data &lt;- "./data/"
+name_file &lt;- paste0(path_data, "penguins.csv")
+
+dataset &lt;- read.csv(name_file) # para .txt, ver read.table
+
+head(dataset) 
+```
+
+```
+##   X species    island bill_length_mm bill_depth_mm flipper_length_mm
+## 1 1  Adelie Torgersen           39.1          18.7               181
+## 2 2  Adelie Torgersen           39.5          17.4               186
+## 3 3  Adelie Torgersen           40.3          18.0               195
+## 4 4  Adelie Torgersen             NA            NA                NA
+## 5 5  Adelie Torgersen           36.7          19.3               193
+## 6 6  Adelie Torgersen           39.3          20.6               190
+##   body_mass_g    sex
+## 1        3750   male
+## 2        3800 female
+## 3        3250 female
+## 4          NA   &lt;NA&gt;
+## 5        3450 female
+## 6        3650   male
+```
+
+---
+
+# Importando datos de un archivo .csv
+
+
+```r
+str(dataset)
+```
+
+```
+## 'data.frame':	344 obs. of  8 variables:
+##  $ X                : int  1 2 3 4 5 6 7 8 9 10 ...
+##  $ species          : Factor w/ 3 levels "Adelie","Chinstrap",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ island           : Factor w/ 3 levels "Biscoe","Dream",..: 3 3 3 3 3 3 3 3 3 3 ...
+##  $ bill_length_mm   : num  39.1 39.5 40.3 NA 36.7 39.3 38.9 39.2 34.1 42 ...
+##  $ bill_depth_mm    : num  18.7 17.4 18 NA 19.3 20.6 17.8 19.6 18.1 20.2 ...
+##  $ flipper_length_mm: int  181 186 195 NA 193 190 181 195 193 190 ...
+##  $ body_mass_g      : int  3750 3800 3250 NA 3450 3650 3625 4675 3475 4250 ...
+##  $ sex              : Factor w/ 2 levels "female","male": 2 1 1 NA 1 2 1 2 NA NA ...
+```
+
+--
+
+
+```r
+class(dataset)
+```
+
+```
+## [1] "data.frame"
+```
+
+
+---
+
+# Importando datos de un archivo .csv
+
+
+```r
+summary(dataset)
+```
+
+```
+##        X               species          island    bill_length_mm 
+##  Min.   :  1.00   Adelie   :152   Biscoe   :168   Min.   :32.10  
+##  1st Qu.: 86.75   Chinstrap: 68   Dream    :124   1st Qu.:39.23  
+##  Median :172.50   Gentoo   :124   Torgersen: 52   Median :44.45  
+##  Mean   :172.50                                   Mean   :43.92  
+##  3rd Qu.:258.25                                   3rd Qu.:48.50  
+##  Max.   :344.00                                   Max.   :59.60  
+##                                                   NA's   :2      
+##  bill_depth_mm   flipper_length_mm  body_mass_g       sex     
+##  Min.   :13.10   Min.   :172.0     Min.   :2700   female:165  
+##  1st Qu.:15.60   1st Qu.:190.0     1st Qu.:3550   male  :168  
+##  Median :17.30   Median :197.0     Median :4050   NA's  : 11  
+##  Mean   :17.15   Mean   :200.9     Mean   :4202               
+##  3rd Qu.:18.70   3rd Qu.:213.0     3rd Qu.:4750               
+##  Max.   :21.50   Max.   :231.0     Max.   :6300               
+##  NA's   :2       NA's   :2         NA's   :2
+```
+
+---
+
+# Seleccionando filas y columnas
+
+
+```r
+dataset[1,1] # observación en la 1ra fila y 1ra columna
+```
+
+```
+## [1] 1
+```
+
+```r
+dataset[,1] # todas las observaciones de la 1ra columna
+```
+
+```
+##   [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+##  [19]  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36
+##  [37]  37  38  39  40  41  42  43  44  45  46  47  48  49  50  51  52  53  54
+##  [55]  55  56  57  58  59  60  61  62  63  64  65  66  67  68  69  70  71  72
+##  [73]  73  74  75  76  77  78  79  80  81  82  83  84  85  86  87  88  89  90
+##  [91]  91  92  93  94  95  96  97  98  99 100 101 102 103 104 105 106 107 108
+## [109] 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126
+## [127] 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 144
+## [145] 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162
+## [163] 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180
+## [181] 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198
+## [199] 199 200 201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216
+## [217] 217 218 219 220 221 222 223 224 225 226 227 228 229 230 231 232 233 234
+## [235] 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 251 252
+## [253] 253 254 255 256 257 258 259 260 261 262 263 264 265 266 267 268 269 270
+## [271] 271 272 273 274 275 276 277 278 279 280 281 282 283 284 285 286 287 288
+## [289] 289 290 291 292 293 294 295 296 297 298 299 300 301 302 303 304 305 306
+## [307] 307 308 309 310 311 312 313 314 315 316 317 318 319 320 321 322 323 324
+## [325] 325 326 327 328 329 330 331 332 333 334 335 336 337 338 339 340 341 342
+## [343] 343 344
+```
+
+---
+
+# Seleccionando filas y columnas
+
+
+```r
+dataset[2:3,2] # todas las observaciones de la 2da y 3ra fila, y 2da columna
+```
+
+```
+## [1] Adelie Adelie
+## Levels: Adelie Chinstrap Gentoo
+```
+
+```r
+dataset[dataset$bill_depth_mm &gt; 20,] # todas las observaciones que tengan bill_depth &gt; 20mm
+```
+
+```
+##        X   species    island bill_length_mm bill_depth_mm flipper_length_mm
+## NA    NA      &lt;NA&gt;      &lt;NA&gt;             NA            NA                NA
+## 6      6    Adelie Torgersen           39.3          20.6               190
+## 10    10    Adelie Torgersen           42.0          20.2               190
+## 14    14    Adelie Torgersen           38.6          21.2               191
+## 15    15    Adelie Torgersen           34.6          21.1               198
+## 18    18    Adelie Torgersen           42.5          20.7               197
+## 20    20    Adelie Torgersen           46.0          21.5               194
+## 36    36    Adelie     Dream           39.2          21.1               196
+## 50    50    Adelie     Dream           42.3          21.2               191
+## 62    62    Adelie    Biscoe           41.3          21.1               195
+## 86    86    Adelie     Dream           41.3          20.3               194
+## 112  112    Adelie    Biscoe           45.6          20.3               191
+## 115  115    Adelie    Biscoe           39.6          20.7               191
+## 118  118    Adelie Torgersen           37.3          20.5               199
+## 138  138    Adelie     Dream           40.2          20.1               200
+## NA.1  NA      &lt;NA&gt;      &lt;NA&gt;             NA            NA                NA
+## 288  288 Chinstrap     Dream           51.7          20.3               194
+## 308  308 Chinstrap     Dream           54.2          20.8               201
+## 314  314 Chinstrap     Dream           52.0          20.7               210
+##      body_mass_g    sex
+## NA            NA   &lt;NA&gt;
+## 6           3650   male
+## 10          4250   &lt;NA&gt;
+## 14          3800   male
+## 15          4400   male
+## 18          4500   male
+## 20          4200   male
+## 36          4150   male
+## 50          4150   male
+## 62          4400   male
+## 86          3550   male
+## 112         4600   male
+## 115         3900 female
+## 118         3775   male
+## 138         3975   male
+## NA.1          NA   &lt;NA&gt;
+## 288         3775   male
+## 308         4300   male
+## 314         4800   male
+```
+
+---
+
+# Factores
+
+
+```r
+levels(dataset$species)
+```
+
+```
+## [1] "Adelie"    "Chinstrap" "Gentoo"
+```
+
+```r
+nlevels(dataset$species)
+```
+
+```
+## [1] 3
+```
+
+Si quieren añadir más filas al data frame, recordar que en las columnas que son factores, sólo se puede añadir valores que concuerden con los niveles de los factores existentes.
+
+--
+
+Para convertir factores en caracteres:
+
+
+```r
+head(as.character(dataset$species))
+```
+
+```
+## [1] "Adelie" "Adelie" "Adelie" "Adelie" "Adelie" "Adelie"
+```
+
+---
+
+# Factores
+
+Para convertir factor en numérico:
+
+
+```r
+# Ejemplo
+year &lt;- factor(c(2019,2020,2018))
+year
+```
+
+```
+## [1] 2019 2020 2018
+## Levels: 2018 2019 2020
+```
+
+```r
+# Como lo hago yo:
+as.numeric(as.character(year))
+```
+
+```
+## [1] 2019 2020 2018
+```
+
+```r
+# Como se recomienda hacer:
+as.numeric(levels(year))[year]
+```
+
+```
+## [1] 2019 2020 2018
+```
+
+---
+
+# Fechas
+
+Utilizaremos otro ejemplo de archivo de entrada.
+
+
+```r
+download.file(url = "https://ndownloader.figshare.com/files/2292169",
+              destfile = paste0(path_data,"portal_data_joined.csv"))
+```
+
+
+```r
+surveys &lt;- read.csv(paste0(path_data,"portal_data_joined.csv"), stringsAsFactors = FALSE)
+head(surveys)
+```
+
+```
+##   record_id month day year plot_id species_id sex hindfoot_length weight
+## 1         1     7  16 1977       2         NL   M              32     NA
+## 2        72     8  19 1977       2         NL   M              31     NA
+## 3       224     9  13 1977       2         NL                  NA     NA
+## 4       266    10  16 1977       2         NL                  NA     NA
+## 5       349    11  12 1977       2         NL                  NA     NA
+## 6       363    11  12 1977       2         NL                  NA     NA
+##     genus  species   taxa plot_type
+## 1 Neotoma albigula Rodent   Control
+## 2 Neotoma albigula Rodent   Control
+## 3 Neotoma albigula Rodent   Control
+## 4 Neotoma albigula Rodent   Control
+## 5 Neotoma albigula Rodent   Control
+## 6 Neotoma albigula Rodent   Control
+```
+
+---
+
+# Fechas
+
+
+```r
+str(surveys)
+```
+
+```
+## 'data.frame':	34786 obs. of  13 variables:
+##  $ record_id      : int  1 72 224 266 349 363 435 506 588 661 ...
+##  $ month          : int  7 8 9 10 11 11 12 1 2 3 ...
+##  $ day            : int  16 19 13 16 12 12 10 8 18 11 ...
+##  $ year           : int  1977 1977 1977 1977 1977 1977 1977 1978 1978 1978 ...
+##  $ plot_id        : int  2 2 2 2 2 2 2 2 2 2 ...
+##  $ species_id     : chr  "NL" "NL" "NL" "NL" ...
+##  $ sex            : chr  "M" "M" "" "" ...
+##  $ hindfoot_length: int  32 31 NA NA NA NA NA NA NA NA ...
+##  $ weight         : int  NA NA NA NA NA NA NA NA 218 NA ...
+##  $ genus          : chr  "Neotoma" "Neotoma" "Neotoma" "Neotoma" ...
+##  $ species        : chr  "albigula" "albigula" "albigula" "albigula" ...
+##  $ taxa           : chr  "Rodent" "Rodent" "Rodent" "Rodent" ...
+##  $ plot_type      : chr  "Control" "Control" "Control" "Control" ...
+```
+
+
+---
+
+# Fechas
+
+
+```r
+surveys$fecha_chr &lt;- paste(surveys$year, surveys$month, surveys$day, sep = "-")
+head(surveys,4)
+```
+
+```
+##   record_id month day year plot_id species_id sex hindfoot_length weight
+## 1         1     7  16 1977       2         NL   M              32     NA
+## 2        72     8  19 1977       2         NL   M              31     NA
+## 3       224     9  13 1977       2         NL                  NA     NA
+## 4       266    10  16 1977       2         NL                  NA     NA
+##     genus  species   taxa plot_type  fecha_chr
+## 1 Neotoma albigula Rodent   Control  1977-7-16
+## 2 Neotoma albigula Rodent   Control  1977-8-19
+## 3 Neotoma albigula Rodent   Control  1977-9-13
+## 4 Neotoma albigula Rodent   Control 1977-10-16
+```
+
+--
+
+Convirtiendo a un formato de fecha utilizado por R:
+
+
+```r
+# Calendar date-time object
+surveys$fecha &lt;- as.POSIXct(strptime(surveys$fecha_chr, "%Y-%m-%d"), tz = "") 
+# tz = "" uses the local time zone of my computer; it would be better to have everything in UTC (tz = "GMT")
+```
+
+---
+
+# Fechas
+
+
+```r
+str(surveys$fecha)
+```
+
+```
+##  POSIXct[1:34786], format: "1977-07-16" "1977-08-19" "1977-09-13" "1977-10-16" "1977-11-12" ...
+```
+
+```r
+summary(surveys$fecha)
+```
+
+```
+##                  Min.               1st Qu.                Median 
+## "1977-07-16 00:00:00" "1984-03-12 00:00:00" "1990-07-22 00:00:00" 
+##                  Mean               3rd Qu.                  Max. 
+## "1990-12-15 23:00:35" "1997-07-29 00:00:00" "2002-12-31 00:00:00" 
+##                  NA's 
+##                 "129"
+```
+
+--
+
+¿Qué pasó con los 129 datos faltantes de fecha?
+
+
+---
+
+# Fechas
+
+
+```r
+head(surveys[is.na(surveys$fecha),])
+```
+
+```
+##      record_id month day year plot_id species_id sex hindfoot_length weight
+## 3144     31445     9  31 2000       3         OT   F              20     27
+## 3817     30716     4  31 2000       3         PB   F              24     35
+## 3818     30717     4  31 2000       3         PB   M              26     27
+## 3819     30718     4  31 2000       3         PB   F              26     30
+## 3820     30719     4  31 2000       3         PB   M              26     27
+## 3856     31443     9  31 2000       3         PB   F              25     28
+##            genus  species   taxa                plot_type fecha_chr fecha
+## 3144   Onychomys torridus Rodent Long-term Krat Exclosure 2000-9-31  &lt;NA&gt;
+## 3817 Chaetodipus  baileyi Rodent Long-term Krat Exclosure 2000-4-31  &lt;NA&gt;
+## 3818 Chaetodipus  baileyi Rodent Long-term Krat Exclosure 2000-4-31  &lt;NA&gt;
+## 3819 Chaetodipus  baileyi Rodent Long-term Krat Exclosure 2000-4-31  &lt;NA&gt;
+## 3820 Chaetodipus  baileyi Rodent Long-term Krat Exclosure 2000-4-31  &lt;NA&gt;
+## 3856 Chaetodipus  baileyi Rodent Long-term Krat Exclosure 2000-9-31  &lt;NA&gt;
+```
+
+---
+
+# Fechas y horas
+
+Husos horarios con el paquete `lubridate`
+
+Utilizaremos los datos de jugadas de los Lakers del paquete.
+
+
+```r
+library(lubridate)
+data(lakers)
+str(lakers)
+```
+
+```
+## 'data.frame':	34624 obs. of  13 variables:
+##  $ date     : int  20081028 20081028 20081028 20081028 20081028 20081028 20081028 20081028 20081028 20081028 ...
+##  $ opponent : chr  "POR" "POR" "POR" "POR" ...
+##  $ game_type: chr  "home" "home" "home" "home" ...
+##  $ time     : chr  "12:00" "11:39" "11:37" "11:25" ...
+##  $ period   : int  1 1 1 1 1 1 1 1 1 1 ...
+##  $ etype    : chr  "jump ball" "shot" "rebound" "shot" ...
+##  $ team     : chr  "OFF" "LAL" "LAL" "LAL" ...
+##  $ player   : chr  "" "Pau Gasol" "Vladimir Radmanovic" "Derek Fisher" ...
+##  $ result   : chr  "" "missed" "" "missed" ...
+##  $ points   : int  0 0 0 0 0 2 0 1 0 2 ...
+##  $ type     : chr  "" "hook" "off" "layup" ...
+##  $ x        : int  NA 23 NA 25 NA 25 NA NA NA 36 ...
+##  $ y        : int  NA 13 NA 6 NA 10 NA NA NA 21 ...
+```
+
+---
+
+# Fechas y horas
+
+Obtenemos primero una columna de fecha y hora
+
+
+```r
+lakers$Fecha &lt;- as.POSIXct(strptime(paste(lakers$date, lakers$time, sep = " "), 
+                                    format = "%Y%m%d %H:%M"), 
+                           tz = "America/Los_Angeles")
+
+str(lakers)
+```
+
+```
+## 'data.frame':	34624 obs. of  14 variables:
+##  $ date     : int  20081028 20081028 20081028 20081028 20081028 20081028 20081028 20081028 20081028 20081028 ...
+##  $ opponent : chr  "POR" "POR" "POR" "POR" ...
+##  $ game_type: chr  "home" "home" "home" "home" ...
+##  $ time     : chr  "12:00" "11:39" "11:37" "11:25" ...
+##  $ period   : int  1 1 1 1 1 1 1 1 1 1 ...
+##  $ etype    : chr  "jump ball" "shot" "rebound" "shot" ...
+##  $ team     : chr  "OFF" "LAL" "LAL" "LAL" ...
+##  $ player   : chr  "" "Pau Gasol" "Vladimir Radmanovic" "Derek Fisher" ...
+##  $ result   : chr  "" "missed" "" "missed" ...
+##  $ points   : int  0 0 0 0 0 2 0 1 0 2 ...
+##  $ type     : chr  "" "hook" "off" "layup" ...
+##  $ x        : int  NA 23 NA 25 NA 25 NA NA NA 36 ...
+##  $ y        : int  NA 13 NA 6 NA 10 NA NA NA 21 ...
+##  $ Fecha    : POSIXct, format: "2008-10-28 12:00:00" "2008-10-28 11:39:00" ...
+```
+---
+
+# Fechas y horas
+
+
+```r
+head(lakers$Fecha)
+```
+
+```
+## [1] "2008-10-28 12:00:00 PDT" "2008-10-28 11:39:00 PDT"
+## [3] "2008-10-28 11:37:00 PDT" "2008-10-28 11:25:00 PDT"
+## [5] "2008-10-28 11:23:00 PDT" "2008-10-28 11:22:00 PDT"
+```
+
+
+**Primer caso:** Imaginemos que nos equivocamos y en realidad el huso horario era de New York.
+
+Usamos la función `force_tz` para corregir
+
+
+```r
+lakers$Fecha_corregida &lt;- force_tz(lakers$Fecha, tzone = "America/New_York")
+head(lakers$Fecha_corregida)
+```
+
+```
+## [1] "2008-10-28 12:00:00 EDT" "2008-10-28 11:39:00 EDT"
+## [3] "2008-10-28 11:37:00 EDT" "2008-10-28 11:25:00 EDT"
+## [5] "2008-10-28 11:23:00 EDT" "2008-10-28 11:22:00 EDT"
+```
+
+---
+
+# Fechas y horas
+
+
+```r
+head(lakers$Fecha)
+```
+
+```
+## [1] "2008-10-28 12:00:00 PDT" "2008-10-28 11:39:00 PDT"
+## [3] "2008-10-28 11:37:00 PDT" "2008-10-28 11:25:00 PDT"
+## [5] "2008-10-28 11:23:00 PDT" "2008-10-28 11:22:00 PDT"
+```
+
+**Segundo caso:** El huso sí era el de Los Angeles, pero ahora queremos convertir a hora de New York
+
+Usamos la función `with_tz` para corregir
+
+
+```r
+lakers$Fecha_NY &lt;- with_tz(lakers$Fecha, tzone = "America/New_York")
+head(lakers$Fecha_NY)
+```
+
+```
+## [1] "2008-10-28 15:00:00 EDT" "2008-10-28 14:39:00 EDT"
+## [3] "2008-10-28 14:37:00 EDT" "2008-10-28 14:25:00 EDT"
+## [5] "2008-10-28 14:23:00 EDT" "2008-10-28 14:22:00 EDT"
+```
+
+---
+
+# Control de calidad
+
+¿Qué condiciones chequear en los datos para detectar problemas?
+
+(5 minutos para poner ideas en el google doc)
+
+
+<div class="countdown" id="timer_5fb98552" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+# Pipes y funciones en tidyverse
+
+
+```r
+library(dplyr) # funciones tipo filter, select, mutate, group_by, arrange, count
+
+# Filtrando NAs en la variable weight del objeto surveys y creando nuevo objeto surveys_gw
+surveys_gw &lt;- surveys %&gt;% 
+  filter(!is.na(weight))
+```
+
+--
+
+
+```r
+# 1. Filtrando NAs en la variable weight del objeto surveys
+# 2. agrupando por plot_id y genus
+# 3. En cada grupo, calcular el promedio de weight
+(surveys_gw &lt;- surveys %&gt;% 
+  filter(!is.na(weight)) %&gt;% 
+    group_by(plot_id, genus) %&gt;% 
+    summarize(mean_weight = mean(weight))
+)
+```
+
+```
+## `summarise()` regrouping output by 'plot_id' (override with `.groups` argument)
+```
+
+```
+## # A tibble: 196 x 3
+## # Groups:   plot_id [24]
+##    plot_id genus           mean_weight
+##      &lt;int&gt; &lt;chr&gt;                 &lt;dbl&gt;
+##  1       1 Baiomys                7   
+##  2       1 Chaetodipus           22.2 
+##  3       1 Dipodomys             60.2 
+##  4       1 Neotoma              156.  
+##  5       1 Onychomys             27.7 
+##  6       1 Perognathus            9.62
+##  7       1 Peromyscus            22.2 
+##  8       1 Reithrodontomys       11.4 
+##  9       2 Baiomys                6   
+## 10       2 Chaetodipus           25.1 
+## # … with 186 more rows
+```
+
+---
+
+# Pipes, spread y gather
+
+Veamos nuevamente el resultado
+
+
+```r
+surveys_gw
+```
+
+```
+## # A tibble: 196 x 3
+## # Groups:   plot_id [24]
+##    plot_id genus           mean_weight
+##      &lt;int&gt; &lt;chr&gt;                 &lt;dbl&gt;
+##  1       1 Baiomys                7   
+##  2       1 Chaetodipus           22.2 
+##  3       1 Dipodomys             60.2 
+##  4       1 Neotoma              156.  
+##  5       1 Onychomys             27.7 
+##  6       1 Perognathus            9.62
+##  7       1 Peromyscus            22.2 
+##  8       1 Reithrodontomys       11.4 
+##  9       2 Baiomys                6   
+## 10       2 Chaetodipus           25.1 
+## # … with 186 more rows
+```
+
+¿Y si quisiéramos una columna por genus y no todos los genus en una columna?
+
+Hay que extender la data frame. 
+
+
+---
+
+# Pipes, spread y gather
+
+Extendiendo el/la data frame con una columna por genus
+
+
+```r
+library(tidyr) # para spread y gather
+(surveys_spread &lt;- surveys_gw %&gt;% 
+  spread(key = genus, value = mean_weight))
+```
+
+```
+## # A tibble: 24 x 11
+## # Groups:   plot_id [24]
+##    plot_id Baiomys Chaetodipus Dipodomys Neotoma Onychomys Perognathus
+##      &lt;int&gt;   &lt;dbl&gt;       &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;
+##  1       1    7           22.2      60.2    156.      27.7        9.62
+##  2       2    6           25.1      55.7    169.      26.9        6.95
+##  3       3    8.61        24.6      52.0    158.      26.0        7.51
+##  4       4   NA           23.0      57.5    164.      28.1        7.82
+##  5       5    7.75        18.0      51.1    190.      27.0        8.66
+##  6       6   NA           24.9      58.6    180.      25.9        7.81
+##  7       7   NA           19.9      57.4    170.      23.6        7   
+##  8       8   NA           20.5      59.4    134.      25.9        7.06
+##  9       9   NA           18.9      57.5    162.      27.5        7.37
+## 10      10   NA           22.3      51.8    190       28.7       NA   
+## # … with 14 more rows, and 4 more variables: Peromyscus &lt;dbl&gt;,
+## #   Reithrodontomys &lt;dbl&gt;, Sigmodon &lt;dbl&gt;, Spermophilus &lt;dbl&gt;
+```
+
+¿Y si quisiéramos hacer lo opuesto?
+
+---
+
+# Pipes, spread y gather
+
+Comprimiento el/la data frame con una sola columna para genus
+
+
+```r
+# library(tidyr) # para spread y gather
+(surveys_gather &lt;- surveys_spread %&gt;% 
+  gather(key = genus, value = mean_weight, -plot_id))
+```
+
+```
+## # A tibble: 240 x 3
+## # Groups:   plot_id [24]
+##    plot_id genus   mean_weight
+##      &lt;int&gt; &lt;chr&gt;         &lt;dbl&gt;
+##  1       1 Baiomys        7   
+##  2       2 Baiomys        6   
+##  3       3 Baiomys        8.61
+##  4       4 Baiomys       NA   
+##  5       5 Baiomys        7.75
+##  6       6 Baiomys       NA   
+##  7       7 Baiomys       NA   
+##  8       8 Baiomys       NA   
+##  9       9 Baiomys       NA   
+## 10      10 Baiomys       NA   
+## # … with 230 more rows
+```
+
+---
+
+# Unión de data frames
+
+
+```r
+library(nycflights13) # datos de aviones, aeropuertos y vuelos en formato tibble
+data("airlines") 
+head(airlines, 1) # Pueden usar View 
+```
+
+```
+## # A tibble: 1 x 2
+##   carrier name             
+##   &lt;chr&gt;   &lt;chr&gt;            
+## 1 9E      Endeavor Air Inc.
+```
+
+```r
+data("airports")
+head(airports,1)
+```
+
+```
+## # A tibble: 1 x 8
+##   faa   name                lat   lon   alt    tz dst   tzone           
+##   &lt;chr&gt; &lt;chr&gt;             &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;           
+## 1 04G   Lansdowne Airport  41.1 -80.6  1044    -5 A     America/New_York
+```
+
+---
+
+# Unión de data frames
+
+
+```r
+data("flights")
+head(flights,1)
+```
+
+```
+## # A tibble: 1 x 19
+##    year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
+##   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
+## 1  2013     1     1      517            515         2      830            819
+## # … with 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
+## #   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
+## #   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;
+```
+
+```r
+data("weather")
+head(weather,1)
+```
+
+```
+## # A tibble: 1 x 15
+##   origin  year month   day  hour  temp  dewp humid wind_dir wind_speed wind_gust
+##   &lt;chr&gt;  &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;
+## 1 EWR     2013     1     1     1  39.0  26.1  59.4      270       10.4        NA
+## # … with 4 more variables: precip &lt;dbl&gt;, pressure &lt;dbl&gt;, visib &lt;dbl&gt;,
+## #   time_hour &lt;dttm&gt;
+```
+
+
+---
+
+# Unión de data frames
+
+Si quisiera un data frame de vuelos con el nombre de la compañía aérea:
+
+
+```r
+flights_airlines &lt;- left_join(flights, airlines, by = "carrier")
+```
+
+--
+
+**Desafíos personales:** (10 minutos)
+
+**Desafío 1:** ¿Y si quisiera un data frame de vuelos con datos meteorológicos del aeropuerto de salida a la hora de salida?
+
+**Desafío 2:** quedarse con un data frame que incluya sólo información de la salida de los vuelos, y sólo algunas variables meteorológicas. 
+
+**Desafío 3:** en base a estos datos, hacer un resumen meteorológico de cada aeropuerto
+
+<div class="countdown" id="timer_5fb98404" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+# Unión de data frames
+
+
+```r
+left_join(flights, weather, by = c("origin","time_hour"))
+```
+
+```
+## # A tibble: 336,776 x 32
+##    year.x month.x day.x dep_time sched_dep_time dep_delay arr_time
+##     &lt;int&gt;   &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
+##  1   2013       1     1      517            515         2      830
+##  2   2013       1     1      533            529         4      850
+##  3   2013       1     1      542            540         2      923
+##  4   2013       1     1      544            545        -1     1004
+##  5   2013       1     1      554            600        -6      812
+##  6   2013       1     1      554            558        -4      740
+##  7   2013       1     1      555            600        -5      913
+##  8   2013       1     1      557            600        -3      709
+##  9   2013       1     1      557            600        -3      838
+## 10   2013       1     1      558            600        -2      753
+## # … with 336,766 more rows, and 25 more variables: sched_arr_time &lt;int&gt;,
+## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;,
+## #   dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour.x &lt;dbl&gt;, minute &lt;dbl&gt;,
+## #   time_hour &lt;dttm&gt;, year.y &lt;int&gt;, month.y &lt;int&gt;, day.y &lt;int&gt;, hour.y &lt;int&gt;,
+## #   temp &lt;dbl&gt;, dewp &lt;dbl&gt;, humid &lt;dbl&gt;, wind_dir &lt;dbl&gt;, wind_speed &lt;dbl&gt;,
+## #   wind_gust &lt;dbl&gt;, precip &lt;dbl&gt;, pressure &lt;dbl&gt;, visib &lt;dbl&gt;
+```
+
+---
+
+# Exportando datos
+
+
+```r
+departure_weather &lt;- left_join(flights, weather)
+```
+
+```
+## Joining, by = c("year", "month", "day", "origin", "hour", "time_hour")
+```
+
+
+```r
+write.csv(x = departure_weather, file = paste0(path_data, "depart_weather.csv"))
+```
+
+--
+
+Para seguir trabajando en R, también se puede guardar como objeto R:
+
+
+```r
+saveRDS(object = departure_weather, file = paste0(path_data, "depart_weather.rds"))
+```
+
+Cargar datos .rds:
+
+
+```r
+departure_weather &lt;- readRDS(file = paste0(path_data, "depart_weather.rds"))
+```
+
+---
+
+# Trabajando con sus datos (en grupos)
+
+1. Importen sus datos a R, como data frame
+2. Que todas las columnas estén en el formato correcto
+3. Realicen un control de calidad de sus datos
+4. Produzcan resúmenes de variables, cálculos de correlación, arreglen problemas de NA, y crucen data frames si tienen varias
+5. Exportar datos o guardarlos como objeto R. 
+
+* Asegurarse de que su script esté bien comentado
+* Volver y modificar la hoja de cálculo y ReadMe si es necesario
+
+[30 min?] Pasaré por los grupos.
+
+---
+
+# Bibliografía
+
+Para preparar esta unidad se utilizó:
+
+Material y datos de: 
+  * [Data Carpentry](https://datacarpentry.org/R-ecology-lesson/)
+
+Datos de: 
+  * [Hadley Wickham (2019). nycflights13: Flights that Departed NYC in 2013. R package version 1.0.1.](https://CRAN.R-project.org/package=nycflights13)
+  * [Horst AM, Hill AP, Gorman KB (2020). palmerpenguins: Palmer Archipelago (Antarctica) penguin data. R
+  package version 0.1.0. doi: 10.5281/zenodo.3960218.](https://allisonhorst.github.io/palmerpenguins/) 
+  
+---
+
+# Bibliografía
+
+Más:
+
+  * Fechas:
+    * [Lista de husos horarios](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
+    * [Converting time zones in R: tips, tricks and pitfalls](https://blog.revolutionanalytics.com/2009/06/converting-time-zones.html)
+    * [How do you convert dates/times from one time zone to another in R?](https://stackoverflow.com/questions/1395117/how-do-you-convert-dates-times-from-one-time-zone-to-another-in-r)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

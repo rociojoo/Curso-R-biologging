@@ -1,17 +1,27 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>R para datos de biologging</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Rocío Joo" />
+    <link href="libs/remark-css-0.0.1/chocolate-fonts.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/hygge.css" rel="stylesheet" />
+    <link href="libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+    <script src="libs/anchor-sections-1.0/anchor-sections.js"></script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# R para datos de biologging
+## Gráficos en R
+### Rocío Joo
+### Nov.-Dic. 2020
+
 ---
-title: "R para datos de biologging"
-subtitle: "Gráficos en R"
-author: "Rocío Joo"
-date: "Nov.-Dic.  2020"
-output:
-  xaringan::moon_reader:
-    lib_dir: libs
-    css: ["chocolate-fonts", "hygge"]
-    nature:
-      highlightStyle: github
-      highlightLines: true
-      countIncrementalSlides: false
----
+
 
 
 # Objetivos de esta unidad 
@@ -29,7 +39,8 @@ output:
 
 Primero llamamos a todos los paquetes y definimos los directorios de datos y gráficos
 
-```{r, message=FALSE}
+
+```r
 library(ggplot2) # ggplot
 library(dplyr) # pipe
 library(colorspace) # scale_fill_discrete_qualitative
@@ -46,8 +57,8 @@ library(gganimate) # animations
 library(htmlwidgets) # guardar gráfico interactivo en html
 library(transformr) # para que funcione la animación del objeto espacial
 
-path_data <- "./data/"
-path_plots <- "./img/"
+path_data &lt;- "./data/"
+path_plots &lt;- "./img/"
 ```
 
 ---
@@ -56,18 +67,31 @@ path_plots <- "./img/"
 
 Utilizaremos un ejemplo de [datos de trayectorias de albatross]( https://github.com/tommyclay/alba-wind-behaviour)
 
-```{r, eval = FALSE}
+
+```r
 download.file(url = "https://raw.githubusercontent.com/tommyclay/alba-wind-behaviour/master/Data_inputs/GPS_SouthGeorgia_2012.csv", 
               destfile = paste0(path_data,"GPS_SouthGeorgia_2012.csv"))
 ```
 
-```{r}
-alba <- read.csv(paste0(path_data,"GPS_SouthGeorgia_2012.csv"), 
+
+```r
+alba &lt;- read.csv(paste0(path_data,"GPS_SouthGeorgia_2012.csv"), 
                  stringsAsFactors = TRUE)
 ```
 
-```{r}
+
+```r
 head(alba)
+```
+
+```
+##   ID sex         x         y        ws      dir lod
+## 1 30   M -38.82450 -53.67963 11.091397 82.71483   L
+## 2 30   M -38.84590 -53.64553 11.091397 80.87354   L
+## 3 30   M -38.91547 -53.52238 10.857196 79.94009   L
+## 4 30   M -39.00337 -53.33957  9.923922 83.85688   D
+## 5 30   M -39.07569 -53.17606  9.820369 78.89136   D
+## 6 30   M -39.08345 -53.14556  9.522210 83.13709   D
 ```
 
 
@@ -75,8 +99,20 @@ head(alba)
 
 # Explorando datos de trayectorias
 
-```{r}
+
+```r
 str(alba)
+```
+
+```
+## 'data.frame':	24442 obs. of  7 variables:
+##  $ ID : int  30 30 30 30 30 30 30 30 30 30 ...
+##  $ sex: Factor w/ 2 levels "F","M": 2 2 2 2 2 2 2 2 2 2 ...
+##  $ x  : num  -38.8 -38.8 -38.9 -39 -39.1 ...
+##  $ y  : num  -53.7 -53.6 -53.5 -53.3 -53.2 ...
+##  $ ws : num  11.09 11.09 10.86 9.92 9.82 ...
+##  $ dir: num  82.7 80.9 79.9 83.9 78.9 ...
+##  $ lod: Factor w/ 2 levels "D","L": 2 2 2 1 1 1 1 1 1 1 ...
 ```
 
 * ID: ID del track
@@ -91,10 +127,37 @@ str(alba)
 
 # Explorando datos de trayectorias
 
-```{r}
-alba$ID <- as.factor(alba$ID)
+
+```r
+alba$ID &lt;- as.factor(alba$ID)
 nlevels(alba$ID)
+```
+
+```
+## [1] 38
+```
+
+```r
 summary(alba)
+```
+
+```
+##        ID        sex             x                y                ws          
+##  31     : 1116   F:11480   Min.   :-89.32   Min.   :-69.29   Min.   : 0.08082  
+##  21     : 1002   M:12962   1st Qu.:-56.75   1st Qu.:-55.79   1st Qu.: 6.88778  
+##  28     :  967             Median :-51.99   Median :-53.95   Median : 9.09404  
+##  7      :  957             Mean   :-51.67   Mean   :-53.56   Mean   : 8.92518  
+##  16     :  902             3rd Qu.:-43.47   3rd Qu.:-51.62   3rd Qu.:11.05621  
+##  19     :  894             Max.   :-26.78   Max.   :-32.92   Max.   :23.64610  
+##  (Other):18604                                                                 
+##       dir            lod      
+##  Min.   :  0.02182   D: 7610  
+##  1st Qu.: 40.37756   L:16832  
+##  Median : 76.11334            
+##  Mean   : 78.19417            
+##  3rd Qu.:109.07020            
+##  Max.   :179.97437            
+## 
 ```
 
 
@@ -106,9 +169,12 @@ Así como hay gramática del lenguaje, también hay una gramática de gráficos.
 
 * Data: data frame de donde salen los datos. Cada columna es una variable y cada fila una observación.
 
-```{r, fig.width=3.5, fig.height = 3.5}
+
+```r
 ggplot(data = alba)
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -118,9 +184,12 @@ ggplot(data = alba)
   * aesthetics: qué variables corresponden a qué propiedades del gráfico (e.g. eje x, y, color)
   * facets: qué variables corresponden a diferentes paneles en el plot
 
-```{r, fig.width=4, fig.height = 4}
+
+```r
 ggplot(data = alba, mapping = aes(x = ws, y = dir))
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -128,21 +197,27 @@ ggplot(data = alba, mapping = aes(x = ws, y = dir))
 
 * Geometries: el tipo de gráfico que queremos
 
-```{r, fig.width=4, fig.height = 4}
+
+```r
 ggplot(data = alba, mapping = aes(x = ws, y = dir)) +
   geom_point()
 ```
 
+![](03-Graficos-R_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
 ---
 
 # La gramática de gráficos en ggplot
 
 * Geometries: el tipo de gráfico que queremos
 
-```{r, fig.width=4, fig.height = 4}
+
+```r
 ggplot(data = alba, mapping = aes(x = ws, y = dir, color = sex)) +
   geom_point()
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -152,10 +227,13 @@ ggplot(data = alba, mapping = aes(x = ws, y = dir, color = sex)) +
 
 Asumiendo que no hay problemas de proyección (lo veremos luego)
 
-```{r, fig.width=4, fig.height = 4}
+
+```r
 ggplot(data = alba, mapping = aes(x = x, y = y, color = sex)) +
   geom_point()
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -165,10 +243,13 @@ ggplot(data = alba, mapping = aes(x = x, y = y, color = sex)) +
 
 Si queremos cambiar la estética general dentro de una geometría:
 
-```{r, fig.width=4, fig.height = 4}
+
+```r
 ggplot(data = alba, mapping = aes(x = x, y = y)) +
   geom_point(color = "blue", cex = 0.5)
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -178,10 +259,13 @@ ggplot(data = alba, mapping = aes(x = x, y = y)) +
 
 Los tipos de estética que se pueden usar están relacionados a la geometría que usamos
 
-```{r, fig.width=4, fig.height = 4}
+
+```r
 ggplot(data = alba, aes(x = x, y = y)) +
   geom_line(color = "blue", linetype = 2, cex = 0.1)
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -192,34 +276,42 @@ ggplot(data = alba, aes(x = x, y = y)) +
 geom_line conecta observaciones en el orden de la variable en el eje x; 
 geom_path conecta observaciones en el orden en que aparecen en el df
 
-```{r, fig.width=4, fig.height = 4}
+
+```r
 ggplot(data = alba, aes(x = x, y = y)) +
   geom_path(color = "blue", linetype = 2, cex = 0.1)
 ```
 
+![](03-Graficos-R_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+
 ---
 
 # La gramática de gráficos en ggplot
 
 * Geometries
 
-```{r, fig.width=5.5, fig.height = 4}
+
+```r
 ggplot(data = alba, aes(x = x, y = y)) +
   geom_path(aes(group = ID, color = ID), linetype = 1, size = 2)
 ```
 
+![](03-Graficos-R_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+
 ---
 
 # La gramática de gráficos en ggplot
 
 * Geometries
 
-```{r, fig.width=5.5, fig.height = 4}
+
+```r
 ggplot(data = alba, aes(x = x, y = y)) +
   geom_path(aes(group = ID, color = ID), linetype = 1, size=2) +
   geom_point(cex = 0.1)
-
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
 
 
 ---
@@ -228,12 +320,14 @@ ggplot(data = alba, aes(x = x, y = y)) +
 
 * Geometries
 
-```{r, fig.width=5.5, fig.height = 4}
+
+```r
 ggplot(data = alba, aes(x = x, y = y)) +
   geom_path(aes(group = ID, color = ID), linetype = 1, size=2) +
   geom_point(data = filter(alba, lod == "L"), cex = 0.1)
-
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -243,11 +337,13 @@ ggplot(data = alba, aes(x = x, y = y)) +
 
 Veamos otras geometrías
 
-```{r, fig.width=5.5, fig.height = 4}
+
+```r
 ggplot(data = alba, aes(x = x, y = y)) +
   geom_density_2d()
-
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
 ---
 
 # La gramática de gráficos en ggplot
@@ -256,11 +352,17 @@ ggplot(data = alba, aes(x = x, y = y)) +
 
 Veamos otras geometrías
 
-```{r, fig.width=5, fig.height = 3.5}
+
+```r
 ggplot(data = alba, aes(x = ws)) +
   geom_histogram()
+```
 
 ```
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -270,11 +372,13 @@ ggplot(data = alba, aes(x = ws)) +
 
 Veamos otras geometrías
 
-```{r, fig.width=5, fig.height = 3.5}
+
+```r
 ggplot(data = alba, aes(x = ws)) +
   geom_histogram(binwidth = 0.5)
-
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -284,11 +388,13 @@ ggplot(data = alba, aes(x = ws)) +
 
 Veamos otras geometrías
 
-```{r, fig.width=5, fig.height = 3.5, message=FALSE}
+
+```r
 ggplot(data = alba, aes(x = ws, fill = sex)) +
   geom_histogram()
-
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -298,11 +404,13 @@ ggplot(data = alba, aes(x = ws, fill = sex)) +
 
 Veamos otras geometrías
 
-```{r, fig.width=5, fig.height = 3.5, message=FALSE}
+
+```r
 ggplot(data = alba, aes(x = ws, color = sex)) +
   geom_histogram()
-
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-22-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -312,11 +420,13 @@ ggplot(data = alba, aes(x = ws, color = sex)) +
 
 Veamos otras geometrías
 
-```{r, fig.width=4, fig.height = 4, message=FALSE}
+
+```r
 ggplot(data = alba, aes(y = ws)) +
   geom_boxplot()
-
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -326,11 +436,13 @@ ggplot(data = alba, aes(y = ws)) +
 
 Veamos otras geometrías
 
-```{r, fig.width=5, fig.height = 3.5, message=FALSE}
+
+```r
 ggplot(data = alba, aes(y = ws, x = sex, color = sex)) +
   geom_boxplot()
-
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-24-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -340,11 +452,13 @@ ggplot(data = alba, aes(y = ws, x = sex, color = sex)) +
 
 Veamos otras geometrías
 
-```{r, fig.width=3.5, fig.height = 3.5, message=FALSE}
+
+```r
 ggplot(data = alba, mapping = aes(x = sex)) +
   geom_bar()
-
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -366,10 +480,13 @@ Estos se calculan con la función ggplot tras bambalinas.
 
 Histograma con frecuencia relativa:
 
-```{r, fig.width=4.5, fig.height = 4.5, message=FALSE}
+
+```r
 ggplot(data = alba, mapping = aes(x = ws)) + 
   geom_histogram(aes(y = stat(density)))
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -381,10 +498,13 @@ ggplot(data = alba, mapping = aes(x = ws)) +
 
 Si queremos comparar el número de datos por sexo
 
-```{r, fig.width=4.5, fig.height = 3.5, message=FALSE}
+
+```r
 ggplot(data = alba, mapping = aes(y = sex)) +
   geom_bar()
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -394,10 +514,13 @@ ggplot(data = alba, mapping = aes(y = sex)) +
 
 Si queremos comparar el número de datos por sexo y de luz/oscuridad
 
-```{r, fig.width=4.5, fig.height = 3.5, message=FALSE}
+
+```r
 ggplot(data = alba, mapping = aes(y = sex)) +
   geom_bar(aes(fill = lod))
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-28-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -407,10 +530,13 @@ ggplot(data = alba, mapping = aes(y = sex)) +
 
 Si queremos comparar el número de datos individuales en cada categoría
 
-```{r, fig.width=5.5, fig.height = 4.5, message=FALSE}
+
+```r
 ggplot(data = alba, mapping = aes(y = sex)) +
   geom_bar(aes(fill = lod), position = "dodge")
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-29-1.png)&lt;!-- --&gt;
 
 
 ---
@@ -421,21 +547,13 @@ ggplot(data = alba, mapping = aes(y = sex)) +
 
 Si queremos comparar el número de datos con luz/oscuridad dentro de cada categoría de sexo
 
-```{r, fig.width=5.5, fig.height = 3.5, message=FALSE}
+
+```r
 ggplot(data = alba, mapping = aes(y = sex)) +
   geom_bar(aes(fill = lod), position = "fill")
 ```
 
----
-
-# La gramática de gráficos en ggplot
-
-* Scales: propiedades relacionadas a estética 
-
-`scale_<aesthetic>_<type>`
-
-`<type>` puede ser continuous, discrete, etc.
-
+![](03-Graficos-R_files/figure-html/unnamed-chunk-30-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -443,36 +561,53 @@ ggplot(data = alba, mapping = aes(y = sex)) +
 
 * Scales: propiedades relacionadas a estética 
 
-`scale_<aesthetic>_<type>`
+`scale_&lt;aesthetic&gt;_&lt;type&gt;`
 
-```{r, fig.width=5.5, fig.height = 3.5, message=FALSE}
+`&lt;type&gt;` puede ser continuous, discrete, etc.
+
+
+---
+
+# La gramática de gráficos en ggplot
+
+* Scales: propiedades relacionadas a estética 
+
+`scale_&lt;aesthetic&gt;_&lt;type&gt;`
+
+
+```r
 ggplot(data = alba, mapping = aes(y = sex)) +
   geom_bar(aes(fill = lod), position = "fill") +
   scale_x_continuous(breaks = seq(from = 0, to = 1, by = 0.1))
 ```
 
+![](03-Graficos-R_files/figure-html/unnamed-chunk-31-1.png)&lt;!-- --&gt;
+
 ---
 
 # La gramática de gráficos en ggplot
 
 * Scales: propiedades relacionadas a estética 
 
-`scale_<aesthetic>_<type>`
+`scale_&lt;aesthetic&gt;_&lt;type&gt;`
 
-```{r, fig.width=5.5, fig.height = 3.5, message=FALSE}
+
+```r
 ggplot(data = alba, mapping = aes(y = sex)) +
   geom_bar(aes(fill = lod), position = "fill") +
   scale_x_continuous(breaks = seq(from = 0, to = 1, by = 0.1)) +
   scale_y_discrete(label = c("Female", "Male")) 
 ```
 
+![](03-Graficos-R_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
+
 ---
 
 # La gramática de gráficos en ggplot
 
 * Scales: propiedades relacionadas a estética 
 
-`scale_<aesthetic>_<type>`
+`scale_&lt;aesthetic&gt;_&lt;type&gt;`
 
 Para escalas de color, sugiero paletas como [colorbrewer](https://colorbrewer2.org/),
 [viridis](https://www.thinkingondata.com/something-about-viridis-library/) y [colorspace](https://cran.r-project.org/web/packages/colorspace/vignettes/colorspace.html)
@@ -480,7 +615,8 @@ que consideran [color blindness](https://venngage.com/blog/color-blind-friendly-
 
 --
 
-```{r, fig.width=5, fig.height = 3, message=FALSE}
+
+```r
 ggplot(data = alba, mapping = aes(y = sex)) +
   geom_bar(aes(fill = lod), position = "fill") +
   scale_x_continuous(breaks = seq(from = 0, to = 1, by = 0.1)) +
@@ -488,6 +624,8 @@ ggplot(data = alba, mapping = aes(y = sex)) +
   scale_fill_brewer(palette = "Set2")
 ```
 
+![](03-Graficos-R_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
+
 
 ---
 
@@ -495,14 +633,15 @@ ggplot(data = alba, mapping = aes(y = sex)) +
 
 * Scales: propiedades relacionadas a estética 
 
-`scale_<aesthetic>_<type>`
+`scale_&lt;aesthetic&gt;_&lt;type&gt;`
 
 Para escalas de color, sugiero paletas como [colorbrewer](https://colorbrewer2.org/),
 [viridis](https://www.thinkingondata.com/something-about-viridis-library/) y [colorspace](https://cran.r-project.org/web/packages/colorspace/vignettes/colorspace.html)
 que consideran [color blindness](https://venngage.com/blog/color-blind-friendly-palette/).
 
 
-```{r, fig.width=5, fig.height = 3, message=FALSE}
+
+```r
 ggplot(data = alba, mapping = aes(y = sex)) +
   geom_bar(aes(fill = lod), position = "fill") +
   scale_x_continuous(breaks = seq(from = 0, to = 1, by = 0.1)) +
@@ -510,19 +649,22 @@ ggplot(data = alba, mapping = aes(y = sex)) +
   scale_fill_viridis_d(option = "C")
 ```
 
+![](03-Graficos-R_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
+
 ---
 
 # La gramática de gráficos en ggplot
 
 * Scales: propiedades relacionadas a estética 
 
-`scale_<aesthetic>_<type>`
+`scale_&lt;aesthetic&gt;_&lt;type&gt;`
 
 Para escalas de color, sugiero paletas como [colorbrewer](https://colorbrewer2.org/),
 [viridis](https://www.thinkingondata.com/something-about-viridis-library/) y [colorspace](https://cran.r-project.org/web/packages/colorspace/vignettes/colorspace.html)
 que consideran [color blindness](https://venngage.com/blog/color-blind-friendly-palette/).
 
-```{r, fig.width=5, fig.height = 3, message=FALSE}
+
+```r
 ggplot(data = alba, mapping = aes(y = sex)) +
   geom_bar(aes(fill = lod), position = "fill") +
   scale_x_continuous(breaks = seq(from = 0, to = 1, by = 0.1)) +
@@ -530,25 +672,30 @@ ggplot(data = alba, mapping = aes(y = sex)) +
   scale_fill_viridis_d(option = "C", end = 0.7)
 ```
 
+![](03-Graficos-R_files/figure-html/unnamed-chunk-35-1.png)&lt;!-- --&gt;
+
 ---
 
 # La gramática de gráficos en ggplot
 
 * Scales: propiedades relacionadas a estética 
 
-`scale_<aesthetic>_<type>`
+`scale_&lt;aesthetic&gt;_&lt;type&gt;`
 
 Para escalas de color, sugiero paletas como [colorbrewer](https://colorbrewer2.org/),
 [viridis](https://www.thinkingondata.com/something-about-viridis-library/) y [colorspace](https://cran.r-project.org/web/packages/colorspace/vignettes/colorspace.html)
 que consideran [color blindness](https://venngage.com/blog/color-blind-friendly-palette/).
 
-```{r, fig.width=5, fig.height = 3, message=FALSE}
+
+```r
 ggplot(data = alba, mapping = aes(y = sex)) +
   geom_bar(aes(fill = lod), position = "fill") +
   scale_x_continuous(breaks = seq(from = 0, to = 1, by = 0.1)) +
   scale_y_discrete(label = c("Female", "Male")) +
   scale_fill_discrete_qualitative(palette = "Set 3")
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-36-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -560,12 +707,14 @@ ggplot(data = alba, mapping = aes(y = sex)) +
 
 Facets con una variable
 
-```{r, fig.width=5, fig.height = 3.5, message=FALSE}
+
+```r
 ggplot(data = alba, aes(x = ws)) +
   geom_histogram() +
   facet_wrap(~ sex)
-
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-37-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -575,12 +724,14 @@ ggplot(data = alba, aes(x = ws)) +
 
 Facets con dos variables
 
-```{r, fig.width=5, fig.height = 3.5, message=FALSE}
+
+```r
 ggplot(data = alba, aes(x = ws)) +
   geom_histogram() +
   facet_grid(sex ~ lod)
-
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-38-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -600,11 +751,14 @@ Hay varios tipos de coordenadas. Veamos los que son útiles para mapas.
 
 Hay varios tipos de coordenadas. Veamos los que son útiles para mapas.
 
-```{r, fig.height=5}
+
+```r
 ggplot(data = alba, aes(x = x, y = y)) +
   geom_point() +
   coord_quickmap()
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-39-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -616,14 +770,18 @@ Hay varios tipos de coordenadas. Veamos los que son útiles para mapas.
 
   * coord_map: usa el paquete `mapproj` para hacer proyecciones.
 
-```{r, fig.height=4.5}
+
+```r
 ggplot(data = alba, aes(x = x, y = y)) +
   geom_point() +
   coord_map(projection = "lambert", parameters = c(-45, -65))
+```
 
+![](03-Graficos-R_files/figure-html/unnamed-chunk-40-1.png)&lt;!-- --&gt;
+
+```r
 # parameters: lines of latitude for that serve as the projection's lines of tangency
 # for the Lambert projection to preserve angles locally (conformal mapping)
-
 ```
 
 ---
@@ -633,8 +791,9 @@ ggplot(data = alba, aes(x = x, y = y)) +
 * Coordinates: Sistema de coordenadas. ¿Cómo interpretar x y y?
 
 
-```{r, fig.height=4, warning = FALSE}
-world <- map_data("world")
+
+```r
+world &lt;- map_data("world")
 
 ggplot(data = world, aes(x = long, y = lat)) +
   geom_path(aes(group = group), color = "grey") +
@@ -645,24 +804,30 @@ ggplot(data = world, aes(x = long, y = lat)) +
   coord_map(projection = "lambert", parameters = c(-45, -65))
 ```
 
+![](03-Graficos-R_files/figure-html/unnamed-chunk-41-1.png)&lt;!-- --&gt;
+
 ---
 
 # La gramática de gráficos en ggplot
 
 * Themes: Cambios estéticos no relacionados a los datos
 
-```{r, warning = FALSE, message= FALSE, fig.height = 4}
+
+```r
 ggplot(data = alba, aes(x = ws, color = sex)) +
   geom_histogram() +
   ggtitle("Histograma de wind speed")
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-42-1.png)&lt;!-- --&gt;
 ---
 
 # La gramática de gráficos en ggplot
 
 * Themes: Cambios estéticos no relacionados a los datos
 
-```{r, warning = FALSE, message= FALSE, fig.height = 4}
+
+```r
 ggplot(data = alba, aes(x = ws, color = sex)) +
   geom_histogram() +
   ggtitle("Histograma de wind speed") +
@@ -671,13 +836,16 @@ ggplot(data = alba, aes(x = ws, color = sex)) +
   )
 ```
 
+![](03-Graficos-R_files/figure-html/unnamed-chunk-43-1.png)&lt;!-- --&gt;
+
 ---
 
 # La gramática de gráficos en ggplot
 
 * Themes: Cambios estéticos no relacionados a los datos
 
-```{r, warning = FALSE, message= FALSE, fig.height = 3}
+
+```r
 ggplot(data = alba, aes(x = ws, color = sex)) +
   geom_histogram() +
   ggtitle("Histograma de wind speed") +
@@ -692,13 +860,16 @@ ggplot(data = alba, aes(x = ws, color = sex)) +
   )
 ```
 
+![](03-Graficos-R_files/figure-html/unnamed-chunk-44-1.png)&lt;!-- --&gt;
+
 ---
 
 # La gramática de gráficos en ggplot
 
 * Themes: Cambios estéticos no relacionados a los datos
 
-```{r, warning = FALSE, message= FALSE, fig.height = 3.5}
+
+```r
 ggplot(data = alba, aes(x = ws, color = sex)) +
   geom_histogram() +
   ggtitle("Histograma de wind speed") +
@@ -710,18 +881,23 @@ ggplot(data = alba, aes(x = ws, color = sex)) +
   )
 ```
 
+![](03-Graficos-R_files/figure-html/unnamed-chunk-45-1.png)&lt;!-- --&gt;
+
 ---
 
 # La gramática de gráficos en ggplot
 
 * Themes: Cambios estéticos no relacionados a los datos
 
-```{r, warning = FALSE, message= FALSE, fig.height = 4}
+
+```r
 ggplot(data = alba, aes(x = ws, color = sex)) +
   geom_histogram() +
   theme_light() 
 ```
 
+![](03-Graficos-R_files/figure-html/unnamed-chunk-46-1.png)&lt;!-- --&gt;
+
 
 ---
 
@@ -729,11 +905,14 @@ ggplot(data = alba, aes(x = ws, color = sex)) +
 
 * Themes: Cambios estéticos no relacionados a los datos
 
-```{r, warning = FALSE, message= FALSE, fig.height = 4}
+
+```r
 ggplot(data = alba, aes(x = ws, color = sex)) +
   geom_histogram() +
   theme_classic() 
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-47-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -745,10 +924,9 @@ Desafío 2: A partir de los datos alba, graficar la serie de tiempo de velocidad
 
 [15 minutos, levantar la mano digital al terminar]
 
-```{r, echo = FALSE, message=FALSE, warning=FALSE}
-library(countdown)
-countdown(minutes = 15, seconds = 0)
-```
+<div class="countdown" id="timer_5fbea292" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">15</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
 
 ---
 
@@ -756,13 +934,15 @@ countdown(minutes = 15, seconds = 0)
 
 Desafío 1
 
-```{r, warning = FALSE, message= FALSE, fig.height = 4}
-ggplot(data = weather %>% 
+
+```r
+ggplot(data = weather %&gt;% 
          filter(origin == "LGA"), 
        aes(x = time_hour, y = temp)) +
 geom_line()
-
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-49-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -770,15 +950,17 @@ geom_line()
 
 Desafío 2
 
-```{r, warning = FALSE, message= FALSE, fig.height = 4}
-sub_data <- alba %>% 
+
+```r
+sub_data &lt;- alba %&gt;% 
   filter(ID == "11")
-sub_data$time <- 1:dim(sub_data)[1]
+sub_data$time &lt;- 1:dim(sub_data)[1]
 
 ggplot(data = sub_data, aes(x = time, y = ws)) +
   geom_line()
-
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-50-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -786,9 +968,23 @@ ggplot(data = sub_data, aes(x = time, y = ws)) +
 
 Volvamos a los datos de pingüinos, esta vez usando el paquete `palmerpenguins`
 
-```{r}
+
+```r
 data(penguins)
 head(penguins)
+```
+
+```
+## # A tibble: 6 x 8
+##   species island bill_length_mm bill_depth_mm flipper_length_… body_mass_g sex  
+##   &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;            &lt;int&gt;       &lt;int&gt; &lt;fct&gt;
+## 1 Adelie  Torge…           39.1          18.7              181        3750 male 
+## 2 Adelie  Torge…           39.5          17.4              186        3800 fema…
+## 3 Adelie  Torge…           40.3          18                195        3250 fema…
+## 4 Adelie  Torge…           NA            NA                 NA          NA &lt;NA&gt; 
+## 5 Adelie  Torge…           36.7          19.3              193        3450 fema…
+## 6 Adelie  Torge…           39.3          20.6              190        3650 male 
+## # … with 1 more variable: year &lt;int&gt;
 ```
 
 ---
@@ -797,17 +993,20 @@ head(penguins)
 
 Con el paquete `patchwork`, podemos hacer gráficos distintos y mostrarlos juntos
 
-```{r, warning = FALSE, message= FALSE, fig.height = 3.5}
-plot_1 <- ggplot(data = penguins, aes(x = bill_length_mm, y = bill_depth_mm)) +
+
+```r
+plot_1 &lt;- ggplot(data = penguins, aes(x = bill_length_mm, y = bill_depth_mm)) +
   geom_point()
-plot_2 <- ggplot(data = penguins %>%  filter(!is.na(sex)), 
+plot_2 &lt;- ggplot(data = penguins %&gt;%  filter(!is.na(sex)), 
                  aes(x = bill_length_mm, fill = sex)) + 
   geom_histogram()
-plot_3 <- ggplot(data = penguins %>%  filter(!is.na(sex)), 
+plot_3 &lt;- ggplot(data = penguins %&gt;%  filter(!is.na(sex)), 
                  aes(x = bill_depth_mm, fill = sex)) + 
   geom_histogram()
 plot_1 / (plot_2 | plot_3)
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-52-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -815,40 +1014,55 @@ plot_1 / (plot_2 | plot_3)
 
 Calculamos algunas estadísticas primero
 
-```{r, warning = FALSE, message= FALSE, fig.height = 3.5}
-sum_penguins <- penguins %>%
-  group_by(species, island) %>% 
+
+```r
+sum_penguins &lt;- penguins %&gt;%
+  group_by(species, island) %&gt;% 
   summarise(mass = mean(body_mass_g, na.rm = TRUE), 
             flipper = mean(flipper_length_mm, na.rm = TRUE))
 
-sum_penguins <- sum_penguins %>% 
+sum_penguins &lt;- sum_penguins %&gt;% 
   mutate(spe_isl = paste(species, island, sep = "-"))
 
 sum_penguins
+```
 
+```
+## # A tibble: 5 x 5
+## # Groups:   species [3]
+##   species   island     mass flipper spe_isl         
+##   &lt;fct&gt;     &lt;fct&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;           
+## 1 Adelie    Biscoe    3710.    189. Adelie-Biscoe   
+## 2 Adelie    Dream     3688.    190. Adelie-Dream    
+## 3 Adelie    Torgersen 3706.    191. Adelie-Torgersen
+## 4 Chinstrap Dream     3733.    196. Chinstrap-Dream 
+## 5 Gentoo    Biscoe    5076.    217. Gentoo-Biscoe
 ```
 
 ---
 
 # Texto en los gráficos
 
-```{r, warning = FALSE, message= FALSE, fig.height = 3.5}
 
+```r
 ggplot(data = sum_penguins, aes(x = mass, y = flipper)) +
   geom_point()
-
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-54-1.png)&lt;!-- --&gt;
 
 ---
 
 # Texto en los gráficos
 
-```{r, warning = FALSE, message= FALSE, fig.height = 3.5}
 
+```r
 ggplot(data = sum_penguins, aes(x = mass, y = flipper, label = spe_isl)) +
   geom_point() +
   geom_text()
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-55-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -856,24 +1070,28 @@ ggplot(data = sum_penguins, aes(x = mass, y = flipper, label = spe_isl)) +
 
 Con el paquete `ggrepel`, el texto toma la distancia necesaria
 
-```{r, warning = FALSE, message= FALSE, fig.height = 3.5}
 
+```r
 ggplot(data = sum_penguins, aes(x = mass, y = flipper, label = spe_isl)) +
   geom_point() +
   geom_text_repel()
 ```
 
+![](03-Graficos-R_files/figure-html/unnamed-chunk-56-1.png)&lt;!-- --&gt;
+
 ---
 
 # Guardando gráficos
 
-```{r, warning = FALSE, message= FALSE, fig.height = 3.5}
-p1 <- ggplot(data = sum_penguins, aes(x = mass, y = flipper, label = spe_isl)) +
+
+```r
+p1 &lt;- ggplot(data = sum_penguins, aes(x = mass, y = flipper, label = spe_isl)) +
   geom_point() +
   geom_text_repel()
 ```
 
-```{r, message=FALSE, eval = FALSE}
+
+```r
 ggsave(plot = p1, filename = paste0(path_plots, "penguin_mass_flipper.png"))
 ggsave(plot = p1, filename = paste0(path_plots, "penguin_mass_flipper.pdf"))
 ggsave(plot = p1, filename = paste0(path_plots, "penguin_mass_flipper.svg"))
@@ -897,9 +1115,9 @@ Los juntaremos en sus respectivos grupos.
 
 Tendrán 30 minutos. 
 
-```{r, echo=FALSE}
-countdown(minutes = 30)
-```
+<div class="countdown" id="timer_5fbea232" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">30</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
 
 ---
 
@@ -913,18 +1131,18 @@ countdown(minutes = 30)
 
 Para los datos alba, creamos un index de tiempo, definimos una proyección y transformamos el data frame a objeto sftrack
 
-```{r}
-alba$tiempo <- ave(alba$x, alba$ID, FUN = seq_along)
-proyeccion <- "+init=epsg:4326"
+
+```r
+alba$tiempo &lt;- ave(alba$x, alba$ID, FUN = seq_along)
+proyeccion &lt;- "+init=epsg:4326"
   
-alba_sftrack <- as_sftrack(
+alba_sftrack &lt;- as_sftrack(
   data = alba,
   coords = c("x", "y"),
   time = "tiempo",
   group = "ID",
   crs = proyeccion
 )
-
 ```
 
 ---
@@ -933,40 +1151,92 @@ alba_sftrack <- as_sftrack(
 
 Un objeto `sftrack` está definido como un conjunto de tracks o series de localizaciones. 
 
-```{r}
+
+```r
 head(alba_sftrack)
 ```
 
+```
+## Sftrack with 6 features and 10 fields (0 empty geometries) 
+## Geometry : "geometry" (XY, crs: +init=epsg:4326) 
+## Timestamp : "tiempo" (integer) 
+## Groupings : "sft_group" (*id*) 
+## -------------------------------
+##   ID sex         x         y        ws      dir lod tiempo sft_group
+## 1 30   M -38.82450 -53.67963 11.091397 82.71483   L      1  (id: 30)
+## 2 30   M -38.84590 -53.64553 11.091397 80.87354   L      2  (id: 30)
+## 3 30   M -38.91547 -53.52238 10.857196 79.94009   L      3  (id: 30)
+## 4 30   M -39.00337 -53.33957  9.923922 83.85688   D      4  (id: 30)
+## 5 30   M -39.07569 -53.17606  9.820369 78.89136   D      5  (id: 30)
+## 6 30   M -39.08345 -53.14556  9.522210 83.13709   D      6  (id: 30)
+##                      geometry
+## 1  POINT (-38.8245 -53.67963)
+## 2  POINT (-38.8459 -53.64553)
+## 3 POINT (-38.91547 -53.52238)
+## 4 POINT (-39.00337 -53.33957)
+## 5 POINT (-39.07569 -53.17606)
+## 6 POINT (-39.08345 -53.14556)
+```
+
 ---
 
 # sftrack y sf
 
 Un objeto `sftrack` está definido como un conjunto de tracks o series de localizaciones. 
 
-```{r, warning = FALSE, message= FALSE, fig.height = 5}
+
+```r
 plot(alba_sftrack, axes = TRUE)
 ```
 
+![](03-Graficos-R_files/figure-html/unnamed-chunk-62-1.png)&lt;!-- --&gt;
+
 ---
 
 # sftrack y sf
 
 Un objeto `sftraj` está definido como un conjunto de trayectorias o series de desplazamientos (un desplazamiento conecta 2 localizaciones sucesivas)
 
-```{r, warning = FALSE, message= FALSE}
-alba_sftraj <- as_sftraj(alba_sftrack)
+
+```r
+alba_sftraj &lt;- as_sftraj(alba_sftrack)
 head(alba_sftraj)
 ```
 
+```
+## Sftraj with 6 features and 10 fields (0 empty geometries) 
+## Geometry : "geometry" (XY, crs: +init=epsg:4326) 
+## Timestamp : "tiempo" (integer) 
+## Grouping : "sft_group" (*id*) 
+## -------------------------------
+##   ID sex         x         y        ws      dir lod tiempo sft_group
+## 1 30   M -38.82450 -53.67963 11.091397 82.71483   L      1  (id: 30)
+## 2 30   M -38.84590 -53.64553 11.091397 80.87354   L      2  (id: 30)
+## 3 30   M -38.91547 -53.52238 10.857196 79.94009   L      3  (id: 30)
+## 4 30   M -39.00337 -53.33957  9.923922 83.85688   D      4  (id: 30)
+## 5 30   M -39.07569 -53.17606  9.820369 78.89136   D      5  (id: 30)
+## 6 30   M -39.08345 -53.14556  9.522210 83.13709   D      6  (id: 30)
+##                         geometry
+## 1 LINESTRING (-38.8245 -53.67...
+## 2 LINESTRING (-38.8459 -53.64...
+## 3 LINESTRING (-38.91547 -53.5...
+## 4 LINESTRING (-39.00337 -53.3...
+## 5 LINESTRING (-39.07569 -53.1...
+## 6 LINESTRING (-39.08345 -53.1...
+```
+
 ---
 
 # sftrack y sf
 
 Un objeto `sftraj` está definido como un conjunto de trayectorias o series de desplazamientos (un desplazamiento conecta 2 localizaciones sucesivas)
 
-```{r, warning = FALSE, message= FALSE, fig.height = 5}
+
+```r
 plot(alba_sftraj, axes = TRUE)
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-64-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -974,11 +1244,14 @@ plot(alba_sftraj, axes = TRUE)
 
 Se puede usar ggplot con estos objetos, y con `geom_sf` se reconoce la estructura espacial de los datos
 
-```{r, warning = FALSE, message= FALSE, fig.height=4}
+
+```r
 ggplot(data = alba_sftrack, aes(x = x, y = y, color = ID)) +
   geom_sf() +
   theme(legend.position = "none")
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-65-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -986,10 +1259,11 @@ ggplot(data = alba_sftrack, aes(x = x, y = y, color = ID)) +
 
 Utilicemos mapas de países del paquete `rnaturalearth`
 
-```{r, warning = FALSE, message= FALSE, fig.height=3}
-world <- ne_countries(scale = "medium", returnclass = "sf") # en clase sf
 
-mapa_mundo <- ggplot(data = world) + 
+```r
+world &lt;- ne_countries(scale = "medium", returnclass = "sf") # en clase sf
+
+mapa_mundo &lt;- ggplot(data = world) + 
    geom_sf() 
 
 mapa_mundo +
@@ -998,8 +1272,9 @@ mapa_mundo +
   scale_x_continuous(name = "", limits = c(min(alba_sftrack$x)-1, max(alba_sftrack$x)+1)) +
   theme_light() +
   theme(legend.position = "none") 
-  
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-66-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -1007,11 +1282,12 @@ mapa_mundo +
 
 Utilizaremos datos de la NOAA  para ilustrar con ejemplos
 
-```{r, warning = FALSE, message= FALSE, fig.height=3}
-raster_file <- paste0(path_plots, "sst_io.bin.20201025.tif" )
+
+```r
+raster_file &lt;- paste0(path_plots, "sst_io.bin.20201025.tif" )
 # https://www.cpc.ncep.noaa.gov/products/GIS/GIS_DATA/
 
-sat_vis <- read_stars(raster_file) # read_stars from the stars package
+sat_vis &lt;- read_stars(raster_file) # read_stars from the stars package
 
 ggplot() +
   geom_stars(data = sat_vis) +
@@ -1021,25 +1297,37 @@ ggplot() +
   scale_x_continuous(name = "", limits = c(min(alba_sftrack$x)-1, max(alba_sftrack$x)+1)) +
   theme_light() +
   theme(legend.position = "none") 
-
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-67-1.png)&lt;!-- --&gt;
 
 ---
 
 # raster and shape files
 
-```{r, warning = FALSE, message= FALSE, fig.height=3}
-shape_file <- paste0(path_plots, "sst_io.20201025.shp" )
+
+```r
+shape_file &lt;- paste0(path_plots, "sst_io.20201025.shp" )
 # https://www.cpc.ncep.noaa.gov/products/GIS/GIS_DATA/
 # 
-sat_sh <- st_read(shape_file) # st_read from the sf package
+sat_sh &lt;- st_read(shape_file) # st_read from the sf package
+```
+
+```
+## Reading layer `sst_io.20201025' from data source `/home/rjoo/data/R-biologging/img/sst_io.20201025.shp' using driver `ESRI Shapefile'
+## Simple feature collection with 87 features and 5 fields
+## geometry type:  POLYGON
+## dimension:      XY
+## bbox:           xmin: -180 ymin: -65.22581 xmax: 179 ymax: 83.60185
+## CRS:            4326
 ```
 
 ---
 
 # raster and shape files
 
-```{r, warning = FALSE, message= FALSE, fig.height=3}
+
+```r
 ggplot() +
   geom_sf(data = sat_sh, color = "#56B4E9") +
   geom_sf(data = world)  +
@@ -1048,8 +1336,9 @@ ggplot() +
   scale_x_continuous(name = "", limits = c(min(alba_sftrack$x)-1, max(alba_sftrack$x)+1)) +
   scale_color_viridis_d() +
   theme(legend.position = "none") 
-
 ```
+
+![](03-Graficos-R_files/figure-html/unnamed-chunk-69-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -1057,12 +1346,12 @@ ggplot() +
 
 Hacemos un gráfico sin mapa detrás (más simple y rápido)
 
-```{r, warning = FALSE, message= FALSE, fig.height=3}
-mapa_alba <- ggplot(data = alba_sftraj, aes(color = ID)) +
+
+```r
+mapa_alba &lt;- ggplot(data = alba_sftraj, aes(color = ID)) +
   geom_sf()  +
   theme_light() +
   theme(legend.position = "none") 
-
 ```
 
 ---
@@ -1071,22 +1360,23 @@ mapa_alba <- ggplot(data = alba_sftraj, aes(color = ID)) +
 
 Añadimos la interacción con `plotly`
 
-```{r, eval = FALSE}
+
+```r
 ggplotly(mapa_alba, 
          dynamicTicks = TRUE, session="knitr")
 ```
 
 Y si queremos guardar el gráfico:
 
-```{r, warning = FALSE, message= FALSE, fig.height=5, eval = FALSE}
-mapa_plotly <- ggplotly(mapa_alba, 
+
+```r
+mapa_plotly &lt;- ggplotly(mapa_alba, 
          dynamicTicks = TRUE, session="knitr")
 
-file_store <- paste0(path_plots, "plotly_alba.html")
+file_store &lt;- paste0(path_plots, "plotly_alba.html")
 htmlwidgets::saveWidget(as_widget(mapa_plotly), 
                         file = file.path(normalizePath(dirname(file_store)), 
                                          basename(file_store)))
-
 ```
 
 ---
@@ -1108,11 +1398,12 @@ Como no tenemos el tiempo real en estos datos, asumiremos que a todas las aves l
 
 Y para hacer las animaciones más rápidas, sólo trabajaremos con 2 tracks.
 
-```{r}
-alba_sub <- alba %>% 
+
+```r
+alba_sub &lt;- alba %&gt;% 
   filter(ID == "11" | ID == "12")
 
-alba_sftrack_sub <- as_sftrack(
+alba_sftrack_sub &lt;- as_sftrack(
   data = alba_sub,
   coords = c("x", "y"),
   time = "tiempo",
@@ -1125,8 +1416,9 @@ alba_sftrack_sub <- as_sftrack(
 
 # Animaciones
 
-```{r, eval = FALSE}
-plot_anim <- ggplot(data = alba_sftrack_sub, aes(color = ID)) +
+
+```r
+plot_anim &lt;- ggplot(data = alba_sftrack_sub, aes(color = ID)) +
   geom_sf(cex = 2)  +
   theme_light() +
   theme(legend.position = "none") +
@@ -1137,9 +1429,8 @@ plot_anim <- ggplot(data = alba_sftrack_sub, aes(color = ID)) +
 anim_save(filename = paste0(path_plots, "anim_mp4.gif"), plot_anim) 
 
 # Guardar como mp4
-anim_mp4 <- animate(plot_anim, renderer = ffmpeg_renderer()) # creo que hay que instalar cosas en cada OS para que funcione
+anim_mp4 &lt;- animate(plot_anim, renderer = ffmpeg_renderer()) # creo que hay que instalar cosas en cada OS para que funcione
 anim_save(filename = paste0(path_plots, "anim_mp4.mp4"), anim_mp4) 
-
 ```
 ---
 
@@ -1186,7 +1477,7 @@ Más:
     * [Cookbook for R](http://www.cookbook-r.com/Graphs/)
   * color blindness:
     * [How to Use Color Blind Friendly Palettes to Make Your Charts Accessible](https://venngage.com/blog/color-blind-friendly-palette/)
-    * <a href = "http://www.cookbook-r.com/Graphs/Colors_(ggplot2)">A colorblind-friendly palette</a>
+    * &lt;a href = "http://www.cookbook-r.com/Graphs/Colors_(ggplot2)"&gt;A colorblind-friendly palette&lt;/a&gt;
   * proyecciones:
     * [geoawesomeness](https://www.geoawesomeness.com/best-map-projection/)
     * [ggplot cheatsheet](https://rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
@@ -1210,4 +1501,111 @@ Aun más:
     * [transformr](https://github.com/thomasp85/transformr)
     * [gganimate cheatsheet](https://ugoproto.github.io/ugo_r_doc/pdf/gganimate.pdf)
   * [How to make decisions in visualization](https://www.youtube.com/watch?v=an4QgY5FW-g). Alberto Cairo. DataFest Tbilisi 2020.
-  
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
