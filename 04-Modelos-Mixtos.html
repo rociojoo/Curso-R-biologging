@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>R para datos de biologging</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Rocío Joo" />
+    <link href="libs/remark-css-0.0.1/chocolate-fonts.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/hygge.css" rel="stylesheet" />
+    <link href="libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+    <script src="libs/anchor-sections-1.0/anchor-sections.js"></script>
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# R para datos de biologging
+## Modelos mixtos en R
+### Rocío Joo
+### Nov.-Dic. 2020
+
+---
+
+
+
+# Objetivos de esta unidad 
+
+ * Implementar modelos mixtos en R e interpretar resultados
+ 
+---
+
+# Recordando teoría sobre modelos lineales, generalizados y mixtos
+
+Empezaremos con un trabajo en grupo aleatorio sobre teoría de los modelos. 
+
+[30 minutos] para discutir y llenar el cuestionario cuyo link les enviaré.
+
+--
+
+Veamos las respuestas y conversemos. Luego colgaré las diapositivas.
+
+ 
+---
+
+# Explorando datos
+
+Utilizaremos datos y algunos códigos de [ourcodingclub](https://ourcodingclub.github.io/tutorials/mixed-models/). 
+
+Descargamos primero sus datos de dragones.
+
+
+```r
+library(ggplot2) # plots
+library(lme4) # lmer
+library(MuMIn) # dredge
+
+path_data &lt;- "./data/"
+path_plots &lt;- "./img/"
+```
+
+
+```r
+download.file(url = "https://raw.githubusercontent.com/ourcodingclub/CC-Linear-mixed-models/master/dragons.RData",
+              destfile = paste0(path_data,"dragons.RData"))
+```
+
+
+---
+
+# Explorando datos
+
+
+```r
+load(paste0(path_data,"dragons.RData"))
+```
+
+Los dragones tomaron un test de inteligencia (*testScore*) 
+en 3 lugares (*sites*), ubicados en 
+diferentes niveles de montañas (*mountainRange*), 
+También se tomaron medidas corporales (*bodyLength*)
+
+
+```r
+head(dragons,5)
+```
+
+```
+##   testScore bodyLength mountainRange  X site
+## 1 16.147309   165.5485      Bavarian NA    a
+## 2 33.886183   167.5593      Bavarian NA    a
+## 3  6.038333   165.8830      Bavarian NA    a
+## 4 18.838821   167.6855      Bavarian NA    a
+## 5 33.862328   169.9597      Bavarian NA    a
+```
+
+```r
+str(dragons)
+```
+
+```
+## 'data.frame':	480 obs. of  5 variables:
+##  $ testScore    : num  16.15 33.89 6.04 18.84 33.86 ...
+##  $ bodyLength   : num  166 168 166 168 170 ...
+##  $ mountainRange: Factor w/ 8 levels "Bavarian","Central",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ X            : logi  NA NA NA NA NA NA ...
+##  $ site         : Factor w/ 3 levels "a","b","c": 1 1 1 1 1 1 1 1 1 1 ...
+```
+
+
+---
+
+# Regresión lineal
+
+* Se piensa que hay una relación lineal entre la longitud corporal y 
+el nivel de inteligencia. 
+* Se hará una regresión lineal
+
+
+```r
+reg_lineal &lt;- lm(formula = testScore ~ bodyLength, data = dragons)
+summary(reg_lineal)
+```
+
+```
+## 
+## Call:
+## lm(formula = testScore ~ bodyLength, data = dragons)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -56.962 -16.411  -0.783  15.193  55.200 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -61.31783   12.06694  -5.081 5.38e-07 ***
+## bodyLength    0.55487    0.05975   9.287  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 21.2 on 478 degrees of freedom
+## Multiple R-squared:  0.1529,	Adjusted R-squared:  0.1511 
+## F-statistic: 86.25 on 1 and 478 DF,  p-value: &lt; 2.2e-16
+```
+
+Pendiente: cambio en la variable respuesta por unidad de la variable independiente.
+
+---
+
+# Supuestos
+
+* Hay una relación lineal entre variable dependiente e independiente(s).
+
+
+
+```r
+ggplot(data = dragons, mapping = aes(x = bodyLength, y = testScore)) +
+  geom_point() +
+  geom_smooth(method = "lm") # esto hace la regresión otra vez 
+```
+
+```
+## `geom_smooth()` using formula 'y ~ x'
+```
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+```r
+# la línea se podría suplantar con resultados de reg_lineal como
+# geom_line(aes(y = reg_lineal$fitted.values))
+```
+
+---
+
+# Supuestos
+
+* Los residuales son normales con media 0 y varianza constante
+
+
+```r
+plot(reg_lineal, which = 1) 
+```
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+
+* La media no es realmente cero
+* La varianza no parece constante
+
+---
+
+# Supuestos
+
+* Los residuales son normales con media 0 y varianza constante
+
+
+```r
+dragons$res &lt;- residuals(reg_lineal)
+ggplot(data = dragons, aes(x = res)) +
+  geom_histogram() +
+  theme_bw()
+```
+
+```
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+ * No parece muy normal, pero tampoco extremadamente lejos
+
+---
+
+# Supuestos
+
+* Los residuales son normales con media 0 y varianza constante
+
+
+```r
+plot(reg_lineal, which = 2) 
+```
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+ * No parece estar tan alejado de la normalidad.
+
+---
+
+# Supuestos 
+
+* Combinando información de residuales y ajuste
+
+
+```r
+dragons$predicted &lt;- predict(reg_lineal) # valores predichos del modelo
+
+ggplot(dragons, aes(x = bodyLength, y = testScore)) +
+  geom_smooth(method = "lm", se = FALSE, color = "lightgrey") + # línea de regresión
+  geom_segment(aes(xend = bodyLength, yend = predicted), alpha = .2) + # distancia entre observado y predicho
+  geom_point(aes(color = res)) +  # colorear de acuerdo al tamaño del residual
+  scale_color_viridis_c(begin = 0.2, end = 0.8, option = "plasma") +  # nueva escala de colores 
+  # &lt;
+  geom_point(aes(y = predicted), shape = 1, cex = 0.5) + # dibujar los puntos predichos encima
+  theme_bw()
+```
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+
+---
+
+# Ejemplos problemáticos
+
+Los tomamos prestados de [Applied Statistics with R](https://daviddalpiaz.github.io/appliedstats/model-diagnostics.html#unusual-observations)
+
+Varianza no constante
+
+
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+
+¿Qué hacer aquí?
+
+---
+
+# Ejemplos problemáticos
+
+Los tomamos prestados de [Applied Statistics with R](https://daviddalpiaz.github.io/appliedstats/model-diagnostics.html#unusual-observations)
+
+No linearidad
+
+
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+
+¿Qué hacer aquí?
+
+---
+
+# Ejemplos problemáticos
+
+Los tomamos prestados de [Applied Statistics with R](https://daviddalpiaz.github.io/appliedstats/model-diagnostics.html#unusual-observations)
+
+No normalidad
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+
+¿Qué hacer aquí?
+
+
+---
+
+# Outliers
+
+Adaptamos ejemplos de [Applied Statistics with R](https://daviddalpiaz.github.io/appliedstats/model-diagnostics.html#unusual-observations).
+
+Empezamos generando datos y modelándolos con una regresión lineal
+
+```r
+set.seed(42)
+ex_data  = data.frame(x = 1:10,
+                      y = 10:1 + rnorm(n = 10))
+ex_model = lm(y ~ x, data = ex_data)
+```
+
+---
+
+# Outliers
+
+Añadamos un punto (x, y) y reajustemos una regresión lineal
+
+
+```r
+point_1 = c(5.4, 11) # nuevo punto
+ex_data_1 = rbind(point_1, ex_data) # añadiéndolo
+model_1 = lm(y ~ x, data = ex_data_1) # nuevo modelo
+
+ggplot(data = ex_data_1, aes(x = x, y = y)) +
+  geom_point(color = "#999999") + # plotting all points
+  geom_point(aes(x = x[1], y = y[1]), cex = 4, shape = 1) + # circunferencia para el nuevo punto
+  geom_smooth(data = ex_data, method = "lm", se = FALSE, aes(color = "inicial")) + # línea de regresión del modelo inicial
+  geom_smooth(method = "lm", se = FALSE, aes(color = "nuevo"), linetype = 2) + # línea de regresión del nuevo modelo
+  scale_color_manual(name = "modelos", labels = c("inicial", "nuevo"), values = c("#56B4E9", "#E69F00")) +
+theme_bw()
+```
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
+El punto "extraño" no genera mayores cambios en el modelo. 
+
+
+---
+
+# Outliers
+
+Otro punto (x, y):
+
+
+```r
+point_2 = c(18, -5.7) # nuevo punto
+ex_data_2 = rbind(point_2, ex_data) # añadiéndolo
+model_2 = lm(y ~ x, data = ex_data_2) # nuevo modelo
+
+ggplot(data = ex_data_2, aes(x = x, y = y)) +
+  geom_point(color = "#999999") + # plotting all points
+  geom_point(aes(x = x[1], y = y[1]), cex = 4, shape = 1) + # circunferencia para el nuevo punto
+  geom_smooth(data = ex_data, method = "lm", se = FALSE, aes(color = "inicial")) + # línea de regresión del modelo inicial
+  geom_smooth(method = "lm", se = FALSE, aes(color = "nuevo"), linetype = 2) + # línea de regresión del nuevo modelo
+  scale_color_manual(name = "modelos", labels = c("inicial", "nuevo"), values = c("#56B4E9", "#E69F00")) +
+theme_bw()
+```
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
+El nuevo punto no influencia el modelo.
+
+---
+
+# Outliers
+
+Otro punto (x, y):
+
+
+```r
+point_3 = c(14, 5.1) # nuevo punto
+ex_data_3 = rbind(point_3, ex_data) # añadiéndolo
+model_3 = lm(y ~ x, data = ex_data_3) # nuevo modelo
+
+ggplot(data = ex_data_3, aes(x = x, y = y)) +
+  geom_point(color = "#999999") + # plotting all points
+  geom_point(aes(x = x[1], y = y[1]), cex = 4, shape = 1) + # circunferencia para el nuevo punto
+  geom_smooth(data = ex_data, method = "lm", se = FALSE, aes(color = "inicial")) + # línea de regresión del modelo inicial
+  geom_smooth(method = "lm", se = FALSE, aes(color = "nuevo"), linetype = 2) + # línea de regresión del nuevo modelo
+  scale_color_manual(name = "modelos", labels = c("inicial", "nuevo"), values = c("#56B4E9", "#E69F00")) +
+theme_bw()
+```
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
+El nuevo modelo parece bastante distinto
+
+---
+
+# Supuestos
+
+* ¿Por qué es importante chequearlos?
+
+--
+
+Porque en ellos se basan los modelos. Importante siempre. 
+Necesario si el modelo es para explicar.
+
+--
+
+* ¿Por qué no usar tests?
+
+--
+
+Se puede, pero no hay que confiar a ciegas en un p-valor arbitrario. Ver referencias.
+
+
+---
+
+# Desafío
+
+* En grupos aleatorios, tratar de identificar si hay algún punto que esté influyendo mucho
+sobre la regresión ajustada a los datos de dragones.
+
+* Dentro del GD: CURSO R-biologging/R-Rocío/04-Modelos-Mixtos/Actividades/Dragones/, 
+  * Crear una carpeta ahí con sus iniciales, e.g. "CI-CZ"
+  * Un google doc con sus nombres
+  * Un script R
+  * Archivo(s) de gráfico
+
+[25 minutos]
+
+---
+
+# Modelos mixtos
+
+* Otro escenario: se piensa que el nivel de inteligencia estaría explicado por 
+la longitud corporal, pero que el resultado podría estar afectado por el nivel de 
+montaña en el que se tomó cada muestra. 
+
+* ¿Qué corresponde hacer aquí?
+
+--
+
+* Intentaremos explicar (buena) parte de la variación del nivel de inteligencia
+por la longitud corporal (efecto fijo).
+
+* Parte de la variación residual estaría asociada al nivel de montaña (efecto 
+aleatorio).
+
+* Intentaríamos modelar esta relación entre inteligencia y longitud corporal
+controlando la variación debida a nivel de montaña.
+
+--
+
+
+```r
+mod_mix &lt;- lmer(formula = testScore ~ bodyLength + (1|mountainRange), 
+                data = dragons)
+```
+
+---
+
+
+```r
+summary(mod_mix)
+```
+
+```
+## Linear mixed model fit by REML ['lmerMod']
+## Formula: testScore ~ bodyLength + (1 | mountainRange)
+##    Data: dragons
+## 
+## REML criterion at convergence: 3991.2
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -3.4815 -0.6513  0.0066  0.6685  2.9583 
+## 
+## Random effects:
+##  Groups        Name        Variance Std.Dev.
+##  mountainRange (Intercept) 339.7    18.43   
+##  Residual                  223.8    14.96   
+## Number of obs: 480, groups:  mountainRange, 8
+## 
+## Fixed effects:
+##             Estimate Std. Error t value
+## (Intercept) 43.70938   17.13489   2.551
+## bodyLength   0.03316    0.07865   0.422
+## 
+## Correlation of Fixed Effects:
+##            (Intr)
+## bodyLength -0.924
+```
+
+
+---
+
+# Modelos mixtos
+
+
+```r
+dragons$predicted_modmix &lt;- predict(mod_mix) # valores predichos del modelo 
+
+ggplot(dragons, aes(x = bodyLength, y = testScore, color = mountainRange)) +
+  geom_point(alpha = 0.5) +
+  geom_line(aes(y = predicted_modmix), size = 1.5) +
+  scale_color_brewer(palette = "Set2") +
+  theme_bw()
+```
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-24-1.png)&lt;!-- --&gt;
+
+Efectivamente no se observa una relación fuerte de testScore con bodyLength 
+después de haber controlado por mountainRange. 
+
+---
+
+# Modelos mixtos
+
+Residuales vs. valores predichos
+
+
+```r
+plot(mod_mix, which = 1)
+```
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
+
+No se observan problemas de linealidad, media constante o varianza constante.
+
+---
+
+# Modelos mixtos
+
+
+```r
+qqnorm(resid(mod_mix)) 
+qqline(resid(mod_mix))  
+```
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
+
+O de normalidad. Quizás algún outlier.
+
+¿Cómo interpretar estos resultados? Discutamos.
+
+---
+
+# Modelos mixtos
+
+Un ejemplo más real que el de los dragones, de [Clay et al. (2020)](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/1365-2656.13267).
+
+
+```r
+path_file &lt;- paste0(path_data, "BothSites_forwindexperienced.csv")
+```
+
+
+```r
+download.file(url = "https://raw.githubusercontent.com/tommyclay/alba-wind-behaviour/master/Data_inputs/BothSites_forwindexperienced.csv", destfile = path_file)
+```
+
+
+```r
+dat &lt;- read.csv(file = path_file, na.strings = "NA")
+head(dat)
+```
+
+```
+##   ID TripID   Site Sex Year   WindSp  WindDir
+## 1  9    269 Crozet   F 2010 9.100572 157.8553
+## 2  9    269 Crozet   F 2010 9.100572 157.8553
+## 3  9    269 Crozet   F 2010 9.475041 157.7442
+## 4  9    269 Crozet   F 2010 9.475041 157.7442
+## 5  9    269 Crozet   F 2010 9.475041 157.7442
+## 6  9    269 Crozet   F 2010 9.475041 157.7442
+```
+
+---
+
+# Modelos mixtos
+
+
+```r
+summary(dat)
+```
+
+```
+##        ID            TripID                 Site        Sex       
+##  Min.   :  1.0   Min.   :  1.0   Crozet       :368698   F:199930  
+##  1st Qu.: 63.0   1st Qu.: 97.0   South Georgia: 25454   M:194222  
+##  Median :126.0   Median :196.0                                    
+##  Mean   :130.2   Mean   :196.3                                    
+##  3rd Qu.:200.0   3rd Qu.:299.0                                    
+##  Max.   :259.0   Max.   :385.0                                    
+##       Year          WindSp           WindDir       
+##  Min.   :2010   Min.   : 0.0451   Min.   :-180.00  
+##  1st Qu.:2013   1st Qu.: 6.4381   1st Qu.:  13.33  
+##  Median :2013   Median : 8.7915   Median :  80.39  
+##  Mean   :2014   Mean   : 8.8056   Mean   :  54.00  
+##  3rd Qu.:2016   3rd Qu.:11.1239   3rd Qu.: 122.06  
+##  Max.   :2016   Max.   :23.6461   Max.   : 180.00
+```
+
+El resumen ayuda a ver fácilmente las clases de datos y rangos de valores.
+
+* Hay una línea por punto GPS. 
+* No hay lon, lat o tiempo porque no son relevantes aquí.
+
+---
+
+# Modelos mixtos
+
+Transformando a factor `ID`, `TripID` y `Year`
+
+
+```r
+var_fac &lt;- c("ID", "TripID", "Year") # variables a transformar
+dat[var_fac] &lt;- lapply(dat[,var_fac], factor) # aplicar función factor a esas variables (columnas)
+
+str(dat)
+```
+
+```
+## 'data.frame':	394152 obs. of  7 variables:
+##  $ ID     : Factor w/ 259 levels "1","2","3","4",..: 9 9 9 9 9 9 9 9 9 9 ...
+##  $ TripID : Factor w/ 385 levels "1","2","3","4",..: 269 269 269 269 269 269 269 269 269 269 ...
+##  $ Site   : Factor w/ 2 levels "Crozet","South Georgia": 1 1 1 1 1 1 1 1 1 1 ...
+##  $ Sex    : Factor w/ 2 levels "F","M": 1 1 1 1 1 1 1 1 1 1 ...
+##  $ Year   : Factor w/ 7 levels "2010","2011",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ WindSp : num  9.1 9.1 9.48 9.48 9.48 ...
+##  $ WindDir: num  158 158 158 158 158 ...
+```
+
+
+---
+
+# Modelos mixtos
+
+De [Clay et al. (2020)](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/1365-2656.13267):
+
+* *We first assessed whether **wind speeds** experienced by birds
+varied by **population** and **sex***
+
+
+```r
+WindSp ~ Site + Sex
+```
+
+(Site = population)
+
+--
+
+* *Wind **speed** was modelled as the response variable with a Gaussian error 
+distribution, and the factors **population**, **sex**, their two-way 
+**interaction** and **year** included as covariates.*
+
+
+```r
+lmer(WindSp ~ Site*Sex + Year)
+```
+
+--
+
+* *A **random effect** of **trip identity** nested within **individual identity** 
+was included to account for variation in the number and duration of trips per 
+individual respectively*
+
+
+```r
+lmer(WindSp ~ Site*Sex + Year + (1|ID/TripID))
+```
+
+---
+
+# Modelos mixtos
+
+
+```r
+mod_lin &lt;- lmer(WindSp ~ Site*Sex + Year + (1|ID/TripID), data = dat, REML = TRUE)
+```
+
+* *We performed multi-model inference on the full set of 
+predictor combinations and assessed the best-supported model as 
+that with the lowest Akaike Information Criterion (AIC).*
+
+* *As small differences in AIC are not considered to be meaningful (Burnham &amp;
+Anderson, 2002), if multiple models were within two AIC units, the
+best model was deemed to be that which had the fewest number
+of parameters (i.e. the most parsimonious) (Harrison et al., 2018).*
+
+
+```r
+mod_lin_mv &lt;- lmer(WindSp ~ Site*Sex + Year + (1|ID/TripID), 
+                   data = dat, REML = FALSE)
+# para comparar modelos es mejor hacerlo estimando por máxima verosimilitud
+options(na.action = "na.fail") # sin esto nos da error "global model na action argument not set" 
+# - así nos aseguramos de que la siguiente función nos arroje resultados si no hay
+# valores faltantes. 
+m_set &lt;- dredge(mod_lin_mv) # Genera una tabla de selección de modelos con combinaciones de términos fijos
+```
+
+
+---
+
+# Modelos mixtos
+
+
+```r
+m_set
+```
+
+```
+## Global model call: lmer(formula = WindSp ~ Site * Sex + Year + (1 | ID/TripID), 
+##     data = dat, REML = FALSE)
+## ---
+## Model selection table 
+##    (Int) Sex Sit Yer Sex:Sit df   logLik    AICc delta weight
+## 16 8.364   +   +   +       + 13 -1018031 2036088  0.00   0.91
+## 8  8.413   +   +   +         12 -1018035 2036093  4.62   0.09
+## 6  8.421   +       +         11 -1018044 2036109 20.74   0.00
+## 7  8.702       +   +         11 -1018047 2036116 27.78   0.00
+## 5  8.702           +         10 -1018055 2036130 41.48   0.00
+## 12 8.474   +   +           +  7 -1018061 2036136 47.95   0.00
+## 2  8.523   +                  5 -1018064 2036138 49.81   0.00
+## 4  8.539   +   +              6 -1018064 2036140 51.33   0.00
+## 1  8.906                      4 -1018074 2036157 68.35   0.00
+## 3  8.921       +              5 -1018074 2036158 70.10   0.00
+## Models ranked by AICc(x) 
+## Random terms (all models): 
+## '1 | ID/TripID'
+```
+
+El mejor modelo es el modelo completo. 
+
+---
+
+# Modelos mixtos 
+
+
+
+```r
+plot(mod_lin, which = 1)
+```
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-38-1.png)&lt;!-- --&gt;
+No se observan problemas de linealidad, media constante o varianza constante.
+
+---
+
+# Modelos mixtos
+
+
+```r
+qqnorm(resid(mod_lin)) 
+qqline(resid(mod_lin))  
+```
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-39-1.png)&lt;!-- --&gt;
+
+No tan alejado de la normalidad. 
+
+
+---
+
+# Modelos mixtos
+
+
+```r
+summary(mod_lin)
+```
+
+```
+## Linear mixed model fit by REML ['lmerMod']
+## Formula: WindSp ~ Site * Sex + Year + (1 | ID/TripID)
+##    Data: dat
+## 
+## REML criterion at convergence: 2036073
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -3.4755 -0.6795  0.0071  0.6653  4.6705 
+## 
+## Random effects:
+##  Groups    Name        Variance Std.Dev.
+##  TripID:ID (Intercept)  1.5963  1.2634  
+##  ID        (Intercept)  0.1943  0.4408  
+##  Residual              10.2058  3.1947  
+## Number of obs: 394152, groups:  TripID:ID, 385; ID, 259
+## 
+## Fixed effects:
+##                        Estimate Std. Error t value
+## (Intercept)              8.3655     0.4116  20.322
+## SiteSouth Georgia       -0.8036     0.4259  -1.887
+## SexM                     0.9017     0.1535   5.873
+## Year2011                -1.0823     0.4551  -2.378
+## Year2012                 1.3849     0.4834   2.865
+## Year2013                 0.2590     0.4267   0.607
+## Year2014                 0.2139     0.5103   0.419
+## Year2015                -0.4569     0.5407  -0.845
+## Year2016                 0.1356     0.4309   0.315
+## SiteSouth Georgia:SexM  -1.1939     0.4684  -2.549
+## 
+## Correlation of Fixed Effects:
+##             (Intr) StSthG SexM   Yr2011 Yr2012 Yr2013 Yr2014 Yr2015 Yr2016
+## SiteSothGrg -0.024                                                        
+## SexM        -0.137  0.173                                                 
+## Year2011    -0.879 -0.012 -0.062                                          
+## Year2012    -0.831 -0.332 -0.036  0.759                                   
+## Year2013    -0.939 -0.009 -0.044  0.861  0.808                            
+## Year2014    -0.786 -0.010 -0.037  0.722  0.678  0.766                     
+## Year2015    -0.731 -0.013 -0.074  0.681  0.634  0.720  0.606              
+## Year2016    -0.930 -0.009 -0.051  0.853  0.801  0.906  0.759  0.712       
+## StStGrg:SxM  0.045 -0.602 -0.328  0.020  0.012  0.014  0.012  0.024  0.017
+```
+
+---
+
+# Modelos mixtos
+
+A ver, el mejor está compuesto por año, población y sexo como covariables 
+(e interacción población y sexo) en efectos fijos. 
+
+¿Qué tipo de gráfico nos ayudaría a interpretar las relaciones modeladas?
+
+--
+
+* Haremos una predicción de la velocidad del viento para cada combinación de
+valores de sexo, población y año, las 3 covariables fijas.
+
+
+```r
+pred_df &lt;- expand.grid(Sex = levels(dat$Sex), Site = levels(dat$Site), 
+                       Year = levels(dat$Year)) 
+prediccion &lt;- predict(mod_lin, newdata = pred_df, re.form = NA) # re.form No efectos aleatorios
+pred_df$fit &lt;- prediccion
+```
+
+---
+
+# Modelos mixtos
+
+* Para mantenerlo simple, hacemos un boxplot de la velocidad del viento en función de población y sexo.
+
+
+```r
+ggplot(data = pred_df, aes(x = Site, y = fit, color = Sex)) +
+  geom_boxplot() +
+  scale_color_brewer(palette = "Dark2") +
+  ylab("Velocidad del viento predicha") +
+  theme_bw()
+```
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-42-1.png)&lt;!-- --&gt;
+
+---
+
+# Modelos mixtos generalizados
+
+Usaremos el ejemplo con datos cbpp del paquete `lme4`
+
+
+```r
+data(cbpp)
+head(cbpp)
+```
+
+```
+##   herd incidence size period
+## 1    1         2   14      1
+## 2    1         3   12      2
+## 3    1         4    9      3
+## 4    1         0    5      4
+## 5    2         3   22      1
+## 6    2         1   18      2
+```
+* Son datos de pleuroneumonía bovina contagiosa (`?cbpp`). 
+* Estudio sobre 15 rebaños (herd).
+* Herd: ID del rebaño
+* Incidence: número de nuevos casos serológicos 
+* Size: tamaño del rebaño en un período dado
+* Period: factor de niveles del 1 al 4
+
+---
+
+# Modelos mixtos generalizados
+
+Modelando la incidencia de pleuroneumonía en los rebaños debida al período, 
+controlando por los rebaños muestreados. 
+
+
+```r
+(gm1 &lt;- glmer(cbind(incidence, size - incidence) ~ period + (1 | herd),
+              data = cbpp, family = binomial))
+```
+
+```
+## Generalized linear mixed model fit by maximum likelihood (Laplace
+##   Approximation) [glmerMod]
+##  Family: binomial  ( logit )
+## Formula: cbind(incidence, size - incidence) ~ period + (1 | herd)
+##    Data: cbpp
+##      AIC      BIC   logLik deviance df.resid 
+## 194.0531 204.1799 -92.0266 184.0531       51 
+## Random effects:
+##  Groups Name        Std.Dev.
+##  herd   (Intercept) 0.6421  
+## Number of obs: 56, groups:  herd, 15
+## Fixed Effects:
+## (Intercept)      period2      period3      period4  
+##     -1.3983      -0.9919      -1.1282      -1.5797
+```
+
+---
+
+# Modelos mixtos generalizados
+
+
+```r
+summary(gm1)
+```
+
+```
+## Generalized linear mixed model fit by maximum likelihood (Laplace
+##   Approximation) [glmerMod]
+##  Family: binomial  ( logit )
+## Formula: cbind(incidence, size - incidence) ~ period + (1 | herd)
+##    Data: cbpp
+## 
+##      AIC      BIC   logLik deviance df.resid 
+##    194.1    204.2    -92.0    184.1       51 
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -2.3816 -0.7889 -0.2026  0.5142  2.8791 
+## 
+## Random effects:
+##  Groups Name        Variance Std.Dev.
+##  herd   (Intercept) 0.4123   0.6421  
+## Number of obs: 56, groups:  herd, 15
+## 
+## Fixed effects:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -1.3983     0.2312  -6.048 1.47e-09 ***
+## period2      -0.9919     0.3032  -3.272 0.001068 ** 
+## period3      -1.1282     0.3228  -3.495 0.000474 ***
+## period4      -1.5797     0.4220  -3.743 0.000182 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Correlation of Fixed Effects:
+##         (Intr) perid2 perid3
+## period2 -0.363              
+## period3 -0.340  0.280       
+## period4 -0.260  0.213  0.198
+```
+
+---
+
+# Modelos mixtos generalizados
+
+
+```r
+plot(gm1, which = 1)
+```
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-46-1.png)&lt;!-- --&gt;
+
+---
+
+# Modelos mixtos generalizados
+
+
+```r
+qqnorm(resid(gm1)) 
+qqline(resid(gm1))  
+```
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-47-1.png)&lt;!-- --&gt;
+
+---
+
+# Modelos mixtos generalizados
+
+
+```r
+pred_gm &lt;- data.frame(period = factor(levels(cbpp$period)))
+pred_gm$predict &lt;- predict(gm1, newdata = pred_gm, re.form = NA, type = "response")
+
+ggplot(data = cbpp, aes(x = period, y = incidence/size)) +
+  geom_point(aes(color = herd)) +
+  geom_point(data = pred_gm, aes(x = period, y = predict), cex = 4, shape = 1) +
+  scale_color_viridis_d() +
+  theme_bw()
+```
+
+![](04-Modelos-Mixtos_files/figure-html/unnamed-chunk-48-1.png)&lt;!-- --&gt;
+              
+---
+
+# Su turno
+
+En los grupos definidos, júntense para trabajar con sus datos:
+
+* Según la pregunta de investigación, definan el/los modelo(s) más adecuado(s)
+* Hacer el análisis en R
+* * Dentro del GD: CURSO R-biologging/R-Rocío/04-Modelos-Mixtos/Actividades/DatosPropios/, 
+  * Crear una carpeta ahí con sus iniciales, e.g. "CI-CZ"
+  * Un google doc con sus nombres
+  * Un script R
+  * Archivo(s) de gráfico (o reporte Rmarkdown con R + salidas)
+  * Si prefieren hacer el trabajo individualmente, dentro de la carpeta del grupo, creen subcarpetas por persona
+
+[¿40 minutos?]
+
+---
+
+# Bibliografía
+
+Para preparar esta unidad se utilizó:
+
+Material de: 
+  * [Our coding club. Introduction to linear mixed models.](https://ourcodingclub.github.io/tutorials/mixed-models/)
+  * [Applied statistics with R](https://daviddalpiaz.github.io/appliedstats/model-diagnostics.html#checking-assumptions)
+  * [Visualizing residuals](https://drsimonj.svbtle.com/visualising-residuals)
+  
+Datos de: 
+  * [Our coding club](https://github.com/ourcodingclub/CC-Linear-mixed-models)
+  * [Clay et al. (2020). Sex-specific effects of wind on the flight decisions of a sexually-dimorphic soaring bird: data and R code. ](https://zenodo.org/record/3824065#.XrvM-mhKg2x)
+  * Paquete `lme4`. Douglas Bates, Martin Maechler, Ben Bolker, Steve Walker (2015). Fitting Linear Mixed-Effects Models Using lme4. Journal of Statistical Software, 67(1), 1-48. doi:10.18637/jss.v067.i01.
+
+---
+
+# Bibliografía
+
+Más:
+
+* Paquetes para modelos estadísticos: [CRAN Task View: Analysis of Ecological and Environmental Data](https://cran.r-project.org/web/views/Environmetrics.html)
+
+* Análisis de residuales: Paquete [`DHARMa`](https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html). 
+
+* Tamaño del efecto: Nakagawa, S., &amp; Cuthill, I. C. (2007). [Effect size, confidence interval and statistical significance: a practical guide for biologists](https://doi.org/10.1111/j.1469-185X.2007.00027.x). Biological Reviews, 82(4), 591–605. 
+
+* Escoger modelos: Warton, D. I., Lyons, M., Stoklosa, J., &amp; Ives, A. R. (2016). [Three points to consider when choosing a LM or GLM test for count data.](https://doi.org/10.1111/2041-210X.12552) Methods in Ecology and Evolution, 7(8), 882–890. 
+
+* GAMs: [Introduction to Generalized Additive Models with R and mgcv](https://www.youtube.com/watch?v=sgw4cu8hrZM&amp;t=9135s). Gavin Simpson. Jul. 30, 2020.
+
+---
+
+# Bibliografía
+
+Aun más:
+
+* P-valor y mejores prácticas estadísticas:
+  * Anderson, D. R., Burnham, K. P., &amp; Thompson, W. L. (2000). [Null Hypothesis Testing: Problems, Prevalence, and an Alternative](https://doi.org/10.2307/3803199). The Journal of Wildlife Management, 64(4), 912–923. JSTOR. 
+  * Betensky, R. A. (2019). [The p-Value Requires Context, Not a Threshold](https://doi.org/10.1080/00031305.2018.1529624). The American Statistician, 73(sup1), 115–117. 
+  * Goodman, S. N. (2019). [Why is Getting Rid of P-Values So Hard? Musings on Science and Statistics](https://doi.org/10.1080/00031305.2018.1558111). The American Statistician, 73(sup1), 26–30. 
+  * Wasserstein, R. L., &amp; Lazar, N. A. (2016). [The ASA Statement on p-Values: Context, Process, and Purpose](https://doi.org/10.1080/00031305.2016.1154108). The American Statistician, 70(2), 129–133. 
+  * Zuur, A. F., &amp; Ieno, E. N. (2016). [A protocol for conducting and presenting results of regression-type analyses.](https://doi.org/10.1111/2041-210X.12577) Methods in Ecology and Evolution, 7(6), 636–645. 
+  * Fidler, F., Burgman, M. A., Cumming, G., Buttrose, R., &amp; Thomason, N. (2006). [Impact of Criticism of Null-Hypothesis Significance Testing on Statistical Reporting Practices in Conservation Biology](https://doi.org/10.1111/j.1523-1739.2006.00525.x). Conservation Biology, 20(5), 1539–1544. 
+  * Fidler, F., Geoff, C., Mark, B., &amp; Neil, T. (2004). [Statistical reform in medicine, psychology and ecology](https://doi.org/10.1016/j.socec.2004.09.035). The Journal of Socio-Economics, 33(5), 615–630.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
