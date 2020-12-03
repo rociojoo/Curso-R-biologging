@@ -737,6 +737,8 @@ Más:
 
 * Escoger modelos: Warton, D. I., Lyons, M., Stoklosa, J., & Ives, A. R. (2016). [Three points to consider when choosing a LM or GLM test for count data.](https://doi.org/10.1111/2041-210X.12552) Methods in Ecology and Evolution, 7(8), 882–890. 
 
+* Modelos mixtos: Harrison, X. A., Donaldson, L., Correa-Cano, M. E., Evans, J., Fisher, D. N., Goodwin, C., Robinson, B., Hodgson, D. J., & Inger, R. (2018). [A brief introduction to mixed effects modelling and multi-model inference in ecology (e3113v2).](https://peerj.com/articles/4794/) PeerJ Inc. 
+
 * GAMs: [Introduction to Generalized Additive Models with R and mgcv](https://www.youtube.com/watch?v=sgw4cu8hrZM&t=9135s). Gavin Simpson. Jul. 30, 2020.
 
 ---
