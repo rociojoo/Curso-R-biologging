@@ -1,0 +1,42 @@
+---
+title: "R para datos de biologging"
+subtitle: "Paquetes en R para biologging y datos de tracking"
+author: "Rocío Joo"
+date: "Nov.-Dic.  2020"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["chocolate-fonts", "hygge"]
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+
+# Objetivos de esta unidad
+
+ * Introducción a los paquetes en R para biologging y tracking data
+ * Compartir conocimientos sobre paquetes
+ * Brindar herramientas para mejorar análisis 
+ 
+---
+
+# Paquetes 
+
+ * Revisaremos el artículo ["Navigating through the R packages for movement"](https://besjournals.onlinelibrary.wiley.com/doi/abs/10.1111/1365-2656.13116)
+ * Y el CRAN Task View [Processing and Analysis of Tracking Data](https://cran.r-project.org/web/views/Tracking.html)
+
+---
+
+# Cuestionario
+
+ * Les enviaré el link de un cuestionario sobre paquetes en R y discutiremos al 
+ respecto. 5 min para llenarlo.
+ 
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+library(countdown)
+countdown(minutes = 5, seconds = 0)
+```
+
+
