@@ -1,0 +1,120 @@
+---
+title: "R para datos de biologging"
+subtitle: "R Markdown, Version Control y Reproducibilidad"
+author: "Rocío Joo"
+date: "Nov.-Dic.  2020"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["chocolate-fonts", "hygge"]
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+
+# Objetivos de esta unidad
+
+ * Introducción a documentos R Markdown para crear reportes, presentaciones y 
+ artículos científicos en diferentes formatos.
+ * Introducción a control de versiones con Git y GitHub
+ * Discusión sobre reproducibilidad
+ 
+---
+
+# RMarkdown
+
+ * Haremos una demostración rápida de un reporte usando el template. 
+ * Lo mismo para slides
+ * Mostraré algunos ejemplos propios: 
+  * Reporte juveniles
+  * Partners-at-sea
+  * Mov-eco -> formas de escribir artículos
+  * Diapositivas del curso con `xaringan`
+ * Artículos con [`rticles`](https://github.com/rstudio/rticles)
+
+---
+
+# Git y github
+
+* **Git** es un sistema de control de versiones. 
+
+--
+
+* **Github** es un servicio para alojar repositorios de manera remota. 
+
+--
+
+* Volver a mis ejemplos. 
+* Empezar un repositorio github. Commit. Push.
+
+---
+
+# Reproducibilidad
+
+* ¿Qué tanta confianza tengo en mi trabajo?
+
+  * Haber hecho los análisis correctos
+  * **Haber hecho los análisis correctamente**
+
+--
+
+* Al publicar mi trabajo, si compartiera mis datos, 
+  ¿cualquiera podría reproducir mis análisis?
+  * Tratando de cuantificar este aspecto en ecología del movimiento.
+
+--
+
+## Sugerencias para mayor transparencia
+
+* Tener un repositorio público
+* Compartir datos
+* [Zenodo](https://zenodo.org/)
+* Compartir pre-prints 
+
+--
+
+¿Qué piensan sobre esto?
+
+---
+
+# Redes
+
+* Statistical Ecology Slack group
+* [R-Ladies](https://benubah.github.io/r-community-explorer/rladies.html) y [comunidades de usuaries](https://benubah.github.io/r-community-explorer/rugs.html)
+* [useR!](https://user2021.r-project.org/)
+
+--
+
+¿Qué redes sugieren al grupo?
+
+---
+
+# Actividades
+
+1. Juntarse en grupos
+2. Hacer un plan de trabajo:
+  * ¿Qué análisis queremos hacer? (Terminar los de sesiones anteriores, explorar paquetes, etc.)
+  * Reporte: 
+    Con todo lo que han hecho en el curso hasta ahora, incluyendo descripción de datos, preguntas, análisis e interpretación de resultados. De preferencia en Rmd (pueden ser slides).
+3. Compartir sus resultados
+  * Dentro del GD: CURSO R-biologging/R-Rocío/07-R-Markdown/Actividades/, 
+  * Crear una carpeta con sus iniciales, e.g. "CI-CZ"
+  * Colgar el reporte
+  * Si prefieren hacer el trabajo individualmente, dentro de la carpeta del grupo, creen subcarpetas por persona
+
+
+---
+
+# Bibliografía
+
+* Rmarkdown:
+  * [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/compile.html)
+  * [Introduction to Presentations in Rmarkdown](http://data-analytics.net/cep/Schedule_files/presentations_demo.html)
+  * [ioslides vs. Slidify in R Markdown Presentation](https://yintingchou.com/posts/ioslides-vs-slidify-in-r-markdown-presentation/)
+  * [Comunicando seus resultados com R: aprenda a criar apresentações reprodutíveis](https://www.youtube.com/watch?v=WxKYqtF2qDg)
+
+* Git:
+  * [Happy Git and GitHub for the useR](https://happygitwithr.com/index.html)
+  * [RStudio & Github Integration](https://www.youtube.com/watch?v=E2d91v1Twcc)
